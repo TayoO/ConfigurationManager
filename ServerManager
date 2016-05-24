@@ -1,9 +1,9 @@
-ServerManager
+Class ServerManager
 {
 String pathName;
-ServerGroup [] serverGroupList;
+// ServerGroup [] serverGroupList;
 public static void main (String [] args)
 {
-Syste.out.println("Hello world");
+System.out.println("Hello world");
 }
 }
