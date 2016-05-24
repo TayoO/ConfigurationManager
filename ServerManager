@@ -1,0 +1,9 @@
+ServerManager
+{
+String pathName;
+ServerGroup [] serverGroupList;
+public static void main (String [] args)
+{
+Syste.out.println("Hello world");
+}
+}

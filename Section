@@ -1,0 +1,4 @@
+Class Section{
+String name
+Variable [] variableList
+}

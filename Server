@@ -1,0 +1,22 @@
+Class ServerGroup{
+String name
+Server [] groupMembers;
+}
+Class Server{
+String name
+Section [] sectionList;
+String path;
+}
+
+
+Class Section{
+String name
+Variable [] variableList
+}
+
+
+Class Variable
+{
+String fieldName;
+String value;
+}
