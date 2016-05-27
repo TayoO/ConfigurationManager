@@ -1,14 +1,26 @@
 package serverStuff;
 class Server{
 String name;
-Section [] sectionList;
+static SpecificMap sections= new SpecificMap<String, Section>();
 String path;
 
 public Server(String name, Section ... list)
 {
 this.name=name;
-sectionList = new Section [list.length];
-for (int i=0; i<list.length; i++)
-sectionList[i]=list[i];
 }
+
+
+public String toString()
+{
+	 StringBuilder sb = new StringBuilder();
+sb.append("["+name+"]");
+	while(sections.values().iterator().hasNext()){
+	sb.append("\r\n "+sections.values().iterator().next());
+	}
+	return sb.toString();
+}
+
+
+
+
 }
