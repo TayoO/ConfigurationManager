@@ -10,7 +10,24 @@ public ServerGroup (String name)
 this.name=name;
 }
 
+public ServerGroup (String name, Server [] servers)
+{
+this.name=name;
+for (int i=0; i<servers.length; i++)
+{
+	this.name=name;
+	servers[i].addSection(groupSections);
+	this.servers.put(servers[i].name,servers [i]);
+}
+}
 
+public void addServer( Server[]serv)
+{
+	for (int i=0; i<servers.length; i++)
+	{
+	servers.put(serv[i].name, serv);
+	}
+}
 public String getName()
 {
 	return name;

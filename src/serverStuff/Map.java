@@ -47,7 +47,7 @@ public interface Map< K, V> {
      * @throws NullPointerException if the specified key is null
      */
     public abstract void put(K key, V value);
-
+    public abstract void putAll(Map <K, V> map);
     /**
      * Replaces the value of the leftmost occurrence of the key.
      *

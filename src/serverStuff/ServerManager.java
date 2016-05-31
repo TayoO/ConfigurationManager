@@ -14,13 +14,27 @@ class ServerManager
  Server[] serverList;
 public static void main (String [] args)
 {
+	ServerManager main= new ServerManager();
 ServerGroup test= new ServerGroup("test");
 groups.put("tayo",test);
 System.out.println("Hello "+((ServerGroup) (groups.get((String)"tayo"))).getName());
+main.addGroup("testgroup");
+for (int i=0; i<6;i++){
+	
+
+addServer("num"+i, globalSections);
+}
+groups.get("testgroup").addServers();
+main.groups.get("testgroup");
 }
 public void loadDefault(){
 	
 }
+public static void addServer(String name, SpecificMap sect){
+
+Server serv=new Server(name, sect);
+}
+
 public void addGroup(String name)
 {
 groups.put(name, new ServerGroup(name));
@@ -50,39 +64,7 @@ public void deleteServer(String serverName)
 {
 	groups.remove(serverName);
 }
-/*
-public void GrouptoggleServer(String name, String server)
-{
-if (groups.get(name).serverMap.get(server)==null)
-{
- GroupMap[name].addServer[server]
- serverList[
-}
-else 
-GroupMap[name].deleteServer[server]
-*/
-public void changeLine(Server serv, String sect, Variable var
-		){
-	String fileName="changes.csv";
 
-	  try {
-          // Assume default encoding.
-		  
-          FileWriter fileWriter =
-              new FileWriter(fileName);
-          BufferedWriter bufferedWriter =
-                  new BufferedWriter(fileWriter);
-	String line= (serv.name+"' "+sect+", "+var.fieldName+", "+var.value+","+path);
-	bufferedWriter.write(line);
-	bufferedWriter.close();
-	  }
-	catch(IOException ex) {
-        System.out.println(
-            "Error writing to file '"
-            + fileName + "'");
-        // Or we could just do this:
-        // ex.printStackTrace();
-    }
 
-}
+
 }
