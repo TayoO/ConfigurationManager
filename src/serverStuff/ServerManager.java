@@ -1,12 +1,16 @@
 package serverStuff;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 
 class ServerManager
 {
-String pathName;
+	 static String path;
  static SpecificMap groups= new SpecificMap<String, ServerGroup>();
  static SpecificMap servers= new SpecificMap<String, Server>();
  static SpecificMap globalSections= new SpecificMap<String, Section>();
+ 
  Server[] serverList;
 public static void main (String [] args)
 {
@@ -32,11 +36,14 @@ public void addGroupSections(String [] names, String []ServerGroups)
 {
 	
 }
-public void addServer(String serverName, String [] sections, String [] servergroups){
-	servers.put(serverName, new Server(serverName, sections));
+public void addServer(String serverName, Section [] sections, String [] servergroups){
+	
+	Server added=new Server(serverName, sections);
+	servers.put(serverName, added);
 	for (int i= 0; i<servergroups.length; i++)
 	{
-		groups.get(servergroups[i]).addServer(severName);
+		 ServerGroup  test=(ServerGroup) (groups.get(servergroups[i]));
+		 test.addServer(added);
 	}
 }
 public void deleteServer(String serverName)
@@ -54,7 +61,28 @@ if (groups.get(name).serverMap.get(server)==null)
 else 
 GroupMap[name].deleteServer[server]
 */
-public void pushConfiguration(){
-	
+public void changeLine(Server serv, String sect, Variable var
+		){
+	String fileName="changes.csv";
+
+	  try {
+          // Assume default encoding.
+		  
+          FileWriter fileWriter =
+              new FileWriter(fileName);
+          BufferedWriter bufferedWriter =
+                  new BufferedWriter(fileWriter);
+	String line= (serv.name+"' "+sect+", "+var.fieldName+", "+var.value+","+path);
+	bufferedWriter.write(line);
+	bufferedWriter.close();
+	  }
+	catch(IOException ex) {
+        System.out.println(
+            "Error writing to file '"
+            + fileName + "'");
+        // Or we could just do this:
+        // ex.printStackTrace();
+    }
+
 }
 }
