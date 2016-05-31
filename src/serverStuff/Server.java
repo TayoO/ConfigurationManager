@@ -4,12 +4,19 @@ String name;
 static SpecificMap sections= new SpecificMap<String, Section>();
 String path;
 
-public Server(String name, Section ... list)
+public Server(String name)
 {
 this.name=name;
 }
+public Server(String name, Section [] sects)
+{
+this.name=name;
+for (int i=0;i<sects.length; i++)
+{
+	sections.put(name, sects[i]);
+}
 
-
+}
 public String toString()
 {
 	 StringBuilder sb = new StringBuilder();
