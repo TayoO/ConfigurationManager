@@ -21,11 +21,18 @@ for (int i=0; i<servers.length; i++)
 }
 }
 
-public void addServer( Server[]serv)
+public void addServers( Server[]serv)
 {
 	for (int i=0; i<servers.length; i++)
 	{
 	servers.put(serv[i].name, serv);
+	}
+}
+public void addServers( SpecificMap m)
+{
+	for (int i=0; i<servers.length; i++)
+	{
+	servers.putAll(m);
 	}
 }
 public String getName()
@@ -33,10 +40,20 @@ public String getName()
 	return name;
 }
 public void addServer(Server serv){
+	System.out.println("hey");
 	servers.put(serv.name, serv);
 }
 public void setName(String name)
 {
 	this.name=name;
+}
+public String toString()
+{
+	 StringBuilder sb = new StringBuilder();
+sb.append("["+name+"]");
+	while(servers.values().iterator().hasNext()){
+	sb.append("\r\n "+servers.values().iterator().next());
+	}
+	return sb.toString();
 }
 }
