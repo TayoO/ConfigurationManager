@@ -14,18 +14,18 @@
 		
 		
 		
-	public V remove(String key)
+	public void remove(String key, V value)
 	{
 		length--;
-		return super.remove(key);
+		super.remove(key);
 		
 	
 	}
 	
-	public void put(String key, V value)
+	public V put(String key, V value)
 	{
 		length++;
-		super.put(key, value);
+		return super.put(key, value);
 		
 	}
 }
