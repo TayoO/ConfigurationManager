@@ -19,25 +19,34 @@ ServerGroup test= new ServerGroup("test");
 groups.put("tayo",test);
 System.out.println("Hello "+((ServerGroup) (groups.get((String)"tayo"))).getName());
 main.addGroup("testgroup");
+Server [] testServ= new Server [6];
 for (int i=0; i<6;i++){
-	
+	testServ[i]=addServer("num"+i, globalSections);
 
-addServer("num"+i, globalSections);
+
+test.addServers(testServ);
 }
-groups.get("testgroup").addServers();
+
 main.groups.get("testgroup");
+System.out.println(test.toString());
+System.out.println(test.servers.get("num1"). toString());
 }
 public void loadDefault(){
 	
 }
-public static void addServer(String name, SpecificMap sect){
+public static Server addServer(String name, SpecificMap sect){
 
 Server serv=new Server(name, sect);
+return serv;
 }
 
 public void addGroup(String name)
 {
 groups.put(name, new ServerGroup(name));
+}
+public void addGroup(ServerGroup group)
+{
+groups.put(group.getName(), group);
 }
 public void deleteGroup(String name)
 {
