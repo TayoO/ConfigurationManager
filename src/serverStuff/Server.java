@@ -6,6 +6,7 @@ String path;
 
 public Server(String name)
 {
+	System.out.println("name");
 this.name=name;
 }
 public Server(String name, Section [] sects)

@@ -22,14 +22,14 @@ main.addGroup("testgroup");
 Server [] testServ= new Server [6];
 for (int i=0; i<6;i++){
 	testServ[i]=addServer("num"+i, globalSections);
-
-
+	System.out.println(testServ[i].toString());
 test.addServers(testServ);
 }
 
-main.groups.get("testgroup");
+//main.groups.get("testgroup");
 System.out.println(test.toString());
-System.out.println(test.servers.get("num1"). toString());
+test.servers.put("hey", new Server("hey"));
+System.out.println(test.servers.get("hey"). toString());
 }
 public void loadDefault(){
 	

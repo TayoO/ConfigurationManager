@@ -2,10 +2,10 @@
 	
 	import java.util.NoSuchElementException;
 	import java.util.Arrays;
-	import java.util.HashMap;
+	import java.util.LinkedHashMap;
 	
 	
-	public class SpecificMap<String, V > extends HashMap<String, V>
+	public class SpecificMap<String, V > extends LinkedHashMap<String, V>
 {
 	
 	public int length =0;
@@ -27,6 +27,9 @@
 		length++;
 		return super.put(key, value);
 		
+	}
+	public java.lang.String toString(){
+		return null;
 	}
 }
 	
