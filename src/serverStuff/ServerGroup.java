@@ -48,15 +48,14 @@ public void setName(String name)
 	this.name=name;
 }
 public String toString()
-{System.out.println("toString");
+{System.out.println("toString"+name);
 	 StringBuilder sb = new StringBuilder();
 sb.append("["+name+"]");
-{System.out.println("name="+name);
-System.out.println("sb"+sb.toString());
+{System.out.println("toString"+name);
 String prints;
 
 prints=servers.toString();
-servers.get("num0").toString();
+
 
 	sb.append("\r\n snfs"+prints);
 

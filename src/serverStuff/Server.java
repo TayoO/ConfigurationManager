@@ -6,7 +6,7 @@ String path;
 
 public Server(String name)
 {
-	System.out.println("name");
+	
 this.name=name;
 }
 public Server(String name, Section [] sects)
@@ -14,7 +14,9 @@ public Server(String name, Section [] sects)
 this.name=name;
 for (int i=0;i<sects.length; i++)
 {
+	System.out.println("server created name="+name);
 	sections.put(name, sects[i]);
+	System.out.println("server  put name="+name);
 }
 
 }
@@ -37,9 +39,7 @@ public String toString()
 {
 	 StringBuilder sb = new StringBuilder();
 sb.append("["+name+"]");
-	while(sections.values().iterator().hasNext()){
-	sb.append("\r\n "+sections.values().iterator().next());
-	}
+	sb.append(sections.toString());
 	return sb.toString();
 }
 

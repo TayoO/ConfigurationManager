@@ -14,16 +14,20 @@ class ServerManager
  Server[] serverList;
 public static void main (String [] args)
 {
+	globalSections.put("default", new Section ("title"));
 	ServerManager main= new ServerManager();
 ServerGroup test= new ServerGroup("test");
 groups.put("tayo",test);
-System.out.println("Hello "+((ServerGroup) (groups.get((String)"tayo"))).getName());
 main.addGroup("testgroup");
 Server [] testServ= new Server [6];
 for (int i=0; i<6;i++){
 	testServ[i]=addServer("num"+i, globalSections);
-	System.out.println(testServ[i].toString());
+	System.out.println("line26 "+testServ[i].toString());
+	testServ[i]=new Server("num"+i, globalSections);
+	System.out.println("line28 "+testServ[i].toString());
+	
 test.addServers(testServ);
+System.out.println(test.toString());
 }
 
 //main.groups.get("testgroup");
@@ -67,6 +71,7 @@ public void addServer(String serverName, Section [] sections, String [] servergr
 	{
 		 ServerGroup  test=(ServerGroup) (groups.get(servergroups[i]));
 		 test.addServer(added);
+
 	}
 }
 public void deleteServer(String serverName)
