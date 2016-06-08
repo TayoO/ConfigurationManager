@@ -1,7 +1,9 @@
 package serverStuff;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Scanner;
@@ -17,9 +19,12 @@ class ServerManager
 public static void main (String [] args)
 {
 
+	String [] pushServers= new String [] {"hello","second","third", "fourth", "fifth"};
+	String [] changes=new String []  {"data,linkedList,double","seconddata,linkedList,double","thirddata,linkedList,double", "fourthdata,linkedList,double", "fifthdata,linkedList,double"};
 	
 	globalSections.put("default", new Section ("title"));
 	ServerManager main= new ServerManager();
+	main.pushConfiguration(pushServers, changes);
 ServerGroup test= new ServerGroup("test");
 groups.put("tayo",test);
 main.addGroup("testgroup");
@@ -82,47 +87,89 @@ public void deleteServer(String serverName)
 {
 	groups.remove(serverName);
 }
+public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c ){
+	
+	SpecificMap allServ=new SpecificMap <String, Server>();
+	// Put and put all take into account duplicates for length
 
-public void pushConfiguration(String [] sg, String [] s, String change)
+	for (int i=0; i<sg.length; i++){
+		allServ.putAll(sg[i].servers);
+	}
+	for (int i=0; i<server.length;i++){
+		allServ.put(server[i].name, server[i]);
+	}
+			
+ String [] uniqueServers=new String[allServ.length];
+		 
+	for (int i=0; i<allServ.length;i++)
+	uniqueServers [i]=(String)allServ.keySet().iterator().next();
+	pushConfiguration(uniqueServers, c);
+}
+public void pushConfiguration( String [] servers, String []  change)
 {
 	//sg= servergroup s= server
-	for (int i=0; i<sg.length; i++)
+	for (int i=0; i<servers.length; i++)
 	{
-		for (int j=0; j<s.length; j++)
-{
-	pushConfiguration(sg[i]+","+s[j]+","+change);
-}
+
+	pushConfiguration(servers[i]+","+change);
+
 
 	}
 }
 public void pushConfiguration(String line)
 {
+	 try {
+			File file = new File("U:\\test\\changes.csv");
+		
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			BufferedReader br = new BufferedReader(new FileReader("U:\\test\\changes.csv"));
+			try {
+			    StringBuilder sb = new StringBuilder();
+			    line += br.readLine();
+			    int counter=0;
+			    while (br.readLine() != null) {
+			    	counter++;
+			    	System.out.println("line num "+counter);
+			        sb.append(line);
+			        sb.append(System.lineSeparator());
+			        line += br.readLine();
+			    }
+			    String everything = sb.toString();
+			} finally {
+			    br.close();
+			}
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+
+		
+			bw.append(line);
+			bw.close();
+		    
+			System.out.println("Done");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+}
+
+public void pushConfiguration(String line, boolean modify)
+{
+	//find a use for the boolean later
 	  Scanner in = new Scanner(System.in);
 		System.out.println("enter a server name, section variable and value");
 		 String server= in.nextLine();
 		 String section= in.nextLine();
 		 String variable= in.nextLine();
 		 String value= in.nextLine();
-		 
-		 try {
+		
 
 				String content = server+","+section+","+variable+","+value+","+path;
 
-				File file = new File("U:\\test\\changes.csv");
-				// if file doesnt exists, then create it
-				if (!file.exists()) {
-					file.createNewFile();
-				}
-
-				FileWriter fw = new FileWriter(file.getAbsoluteFile());
-				BufferedWriter bw = new BufferedWriter(fw);
-				bw.append(content);
-				bw.close();
-
-				System.out.println("Done");
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+				pushConfiguration(content);
+        
 }
 }
