@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 class ServerManager
@@ -19,30 +21,14 @@ class ServerManager
 public static void main (String [] args)
 {
 
-	String [] pushServers= new String [] {"hello","second","third", "fourth", "fifth"};
+	String [] pushServers= new String [] {"epsilon","second","third", "fourth", "fifth"};
 	String [] changes=new String []  {"data,linkedList,double","seconddata,linkedList,double","thirddata,linkedList,double", "fourthdata,linkedList,double", "fifthdata,linkedList,double"};
 	
-	globalSections.put("default", new Section ("title"));
+//	globalSections.put("default", new Section ("title"));
 	ServerManager main= new ServerManager();
 	main.pushConfiguration(pushServers, changes);
-ServerGroup test= new ServerGroup("test");
-groups.put("tayo",test);
-main.addGroup("testgroup");
-Server [] testServ= new Server [6];
-for (int i=0; i<6;i++){
-	testServ[i]=addServer("num"+i, globalSections);
-	System.out.println("line26 "+testServ[i].toString());
-	testServ[i]=new Server("num"+i, globalSections);
-	System.out.println("line28 "+testServ[i].toString());
-	
-test.addServers(testServ);
-System.out.println(test.toString());
-}
 
-//main.groups.get("testgroup");
-System.out.println(test.toString());
-test.servers.put("hey", new Server("hey"));
-System.out.println(test.servers.get("hey"). toString());
+
 }
 public void loadDefault(){
 	
@@ -88,6 +74,7 @@ public void deleteServer(String serverName)
 	groups.remove(serverName);
 }
 public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c ){
+	System.out.println("push sg server");
 	
 	SpecificMap allServ=new SpecificMap <String, Server>();
 	// Put and put all take into account duplicates for length
@@ -110,8 +97,11 @@ public void pushConfiguration( String [] servers, String []  change)
 	//sg= servergroup s= server
 	for (int i=0; i<servers.length; i++)
 	{
+		for (int j=0; j<change.length; j++){
+			pushConfiguration(servers[i]+","+change[j]);
+		}
 
-	pushConfiguration(servers[i]+","+change);
+
 
 
 	}
@@ -125,35 +115,52 @@ public void pushConfiguration(String line)
 			if (!file.exists()) {
 				file.createNewFile();
 			}
+			try(FileWriter fw = new FileWriter(file.getAbsoluteFile());
+				    BufferedWriter bw = new BufferedWriter(fw);
+				    PrintWriter out = new PrintWriter(bw))
+				{
+				    out.println(line);
+				 
+				    //more code
+				    System.out.println(line+ "hey");
+				    //more code
+				} 
+			/*
 			BufferedReader br = new BufferedReader(new FileReader("U:\\test\\changes.csv"));
-			try {
-			    StringBuilder sb = new StringBuilder();
+		int counter=0;
+		 LinkedList<String>  sb= new LinkedList<String>();
+		while(br.!=null)
+		{
+		counter++;
+			   
+			    System.out.println("line num "+counter);
+			    sb.add(br.readLine()+System.lineSeparator());
+			    System.out.println("sb: "+sb.getFirst());
 			    line += br.readLine();
-			    int counter=0;
-			    while (br.readLine() != null) {
-			    	counter++;
-			    	System.out.println("line num "+counter);
-			        sb.append(line);
-			        sb.append(System.lineSeparator());
-			        line += br.readLine();
-			    }
-			    String everything = sb.toString();
-			} finally {
+
+		}
+			        		        
+			    
+
+		
 			    br.close();
-			}
+			
 
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 
 		
-			bw.append(line);
+			bw.append(sb.removeFirst());
 			bw.close();
 		    
-			System.out.println("Done");
+			System.out.println("Done");*/
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			
 		}
+		
+	
 }
 
 public void pushConfiguration(String line, boolean modify)
