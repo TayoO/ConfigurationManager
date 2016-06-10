@@ -94,37 +94,68 @@ public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c )
 }
 public void pushConfiguration( String [] servers, String []  change)
 {
-	//sg= servergroup s= server
-	for (int i=0; i<servers.length; i++)
-	{
-		for (int j=0; j<change.length; j++){
-			pushConfiguration(servers[i]+","+change[j]);
-		}
-
-
-
-
-	}
-}
-public void pushConfiguration(String line)
-{
 	 try {
-			File file = new File("U:\\test\\changes.csv");
+			File file = new File("U:\\test\\changes2.csv");
 		
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
 				file.createNewFile();
 			}
-			try(FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 				    BufferedWriter bw = new BufferedWriter(fw);
-				    PrintWriter out = new PrintWriter(bw))
-				{
+				    PrintWriter out = new PrintWriter(bw);
+				
+				//sg= servergroup s= server
+					String []line= new String [change.length*servers.length];				
+	for (int i=0; i<servers.length; i++)
+	{
+		for (int j=0; j<change.length; j++){
+			//Sketchy hack
+			//System.out.println(servers[i]+","+change[j]);
+			out.println( ("i"+i+"j"+j+" Name: "+servers[i]+","+change[j]));
+			out.println("sup");
+			 
+			pushConfiguration(line[i*change.length+j], out);
+		
+		
+	}
+				}
+	
+
+	
+
+
+
+	 } catch (IOException e) {
+			e.printStackTrace();
+			
+		}
+		
+}
+public void pushConfiguration(String line,  PrintWriter out)
+{
+
+		
+
 				    out.println(line);
-				 
+				   out.println("sup");
+	
 				    //more code
-				    System.out.println(line+ "hey");
+				    
 				    //more code
-				} 
+} 
+public void pushConfiguration(String []line,  PrintWriter out)
+{
+	for (int i=0; i<line.length; i++){
+		
+
+				    out.println(line[i]);
+				   out.println("sup");
+	} 
+				    //more code
+				    
+				    //more code
+} 
 			/*
 			BufferedReader br = new BufferedReader(new FileReader("U:\\test\\changes.csv"));
 		int counter=0;
@@ -155,15 +186,9 @@ public void pushConfiguration(String line)
 		    
 			System.out.println("Done");*/
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			
-		}
 		
-	
-}
 
-public void pushConfiguration(String line, boolean modify)
+public void pushConfiguration(String line, boolean modify, PrintWriter out)
 {
 	//find a use for the boolean later
 	  Scanner in = new Scanner(System.in);
@@ -176,7 +201,7 @@ public void pushConfiguration(String line, boolean modify)
 
 				String content = server+","+section+","+variable+","+value+","+path;
 
-				pushConfiguration(content);
+				//pushConfiguration(content, out);
         
 }
 }
