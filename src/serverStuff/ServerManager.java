@@ -79,10 +79,10 @@ public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c )
 	SpecificMap allServ=new SpecificMap <String, Server>();
 	// Put and put all take into account duplicates for length
 
-	for (int i=0; i<sg.length; i++){
+	for (int i=0; i<sg.length-2; i++){
 		allServ.putAll(sg[i].servers);
 	}
-	for (int i=0; i<server.length;i++){
+	for (int i=0; i<server.length-2;i++){
 		allServ.put(server[i].name, server[i]);
 	}
 			
@@ -95,7 +95,7 @@ public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c )
 public void pushConfiguration( String [] servers, String []  change)
 {
 	 try {
-			File file = new File("U:\\test\\changes2.csv");
+			File file = new File("U:\\test\\changes.csv");
 		
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
@@ -104,25 +104,20 @@ public void pushConfiguration( String [] servers, String []  change)
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 				    BufferedWriter bw = new BufferedWriter(fw);
 				    PrintWriter out = new PrintWriter(bw);
-				
+				{
 				//sg= servergroup s= server
 					String []line= new String [change.length*servers.length];				
 	for (int i=0; i<servers.length; i++)
 	{
 		for (int j=0; j<change.length; j++){
-			//Sketchy hack
-			//System.out.println(servers[i]+","+change[j]);
-			out.println( ("i"+i+"j"+j+" Name: "+servers[i]+","+change[j]));
-			out.println("sup");
-			 
-			pushConfiguration(line[i*change.length+j], out);
-		
+			System.out.println(servers[i]+","+change[j]);
+			 line[j*servers.length+i]= (servers[i]+","+change[j]);
+			pushConfiguration(line, out);
+		}
 		
 	}
 				}
-	
 
-	
 
 
 
@@ -132,24 +127,12 @@ public void pushConfiguration( String [] servers, String []  change)
 		}
 		
 }
-public void pushConfiguration(String line,  PrintWriter out)
-{
-
-		
-
-				    out.println(line);
-				   out.println("sup");
-	
-				    //more code
-				    
-				    //more code
-} 
 public void pushConfiguration(String []line,  PrintWriter out)
 {
 	for (int i=0; i<line.length; i++){
 		
 
-				    out.println(line[i]);
+				    out.println(line[i]+"\r\n");
 				   out.println("sup");
 	} 
 				    //more code
