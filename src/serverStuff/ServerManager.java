@@ -18,7 +18,7 @@ class ServerManager
  static SpecificMap globalSections= new SpecificMap<String, Section>();
  
  Server[] serverList;
-public static void main (String [] args)
+public static void main (String [] args) throws IOException
 {
 
 	String [] pushServers= new String [] {"epsilon","second","third", "fourth", "fifth"};
@@ -73,7 +73,7 @@ public void deleteServer(String serverName)
 {
 	groups.remove(serverName);
 }
-public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c ){
+public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c ) throws IOException{
 	System.out.println("push sg server");
 	
 	SpecificMap allServ=new SpecificMap <String, Server>();
@@ -90,41 +90,37 @@ public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c )
 		 
 	for (int i=0; i<allServ.length;i++)
 	uniqueServers [i]=(String)allServ.keySet().iterator().next();
-	pushConfiguration(uniqueServers, c);
+	pushConfiguration(uniqueServers, c) ;
 }
-public void pushConfiguration( String [] servers, String []  change)
-{
-	 try {
-			File file = new File("U:\\test\\changes.csv");
-		
-			// if file doesnt exists, then create it
-			if (!file.exists()) {
-				file.createNewFile();
+public void pushConfiguration( String [] servers, String []  change)throws IOException{
+	 File log = new File("U:\\test\\changes.csv");
+	    try{
+	    if(log.exists()==false){
+	            System.out.println("We had to make a new file.");
+	            log.createNewFile();
+	    }
+	    PrintWriter out = new PrintWriter(new FileWriter(log, true));
+	    for (int i=0; i<servers.length; i++)
+		{
+			for (int j=0; j<change.length; j++){
+				System.out.println(servers[i]+","+change[j]);
+				 //line[i*change.length+j]= 
+				out.append(servers[i]+","+change[j]+"\r\n");
+				System.out.println(servers[i]+","+change[j]);
+				
 			}
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-				    BufferedWriter bw = new BufferedWriter(fw);
-				    PrintWriter out = new PrintWriter(bw);
-				{
-				//sg= servergroup s= server
-					String []line= new String [change.length*servers.length];				
-	for (int i=0; i<servers.length; i++)
-	{
-		for (int j=0; j<change.length; j++){
-			System.out.println(servers[i]+","+change[j]);
-			 line[j*servers.length+i]= (servers[i]+","+change[j]);
-			pushConfiguration(line, out);
-		}
-		
-	}
-				}
-
-
-
-
-	 } catch (IOException e) {
-			e.printStackTrace();
 			
 		}
+	    
+	    out.close();
+	    }catch(IOException e)
+	    {
+	        System.out.println("COULD NOT LOG!!");
+	    }
+
+}
+{
+
 		
 }
 public void pushConfiguration(String []line,  PrintWriter out)
@@ -133,7 +129,7 @@ public void pushConfiguration(String []line,  PrintWriter out)
 		
 
 				    out.println(line[i]+"\r\n");
-				   out.println("sup");
+				    out.append("sup");
 	} 
 				    //more code
 				    
@@ -170,7 +166,18 @@ public void pushConfiguration(String []line,  PrintWriter out)
 			System.out.println("Done");*/
 
 		
+public void pushConfiguration(String line,  PrintWriter out)
+{
+	
+		
 
+				    out.println(line+"\r\n");
+				    out.append("sup");
+	
+				    //more code
+				    
+				    //more code
+}
 public void pushConfiguration(String line, boolean modify, PrintWriter out)
 {
 	//find a use for the boolean later
@@ -184,7 +191,7 @@ public void pushConfiguration(String line, boolean modify, PrintWriter out)
 
 				String content = server+","+section+","+variable+","+value+","+path;
 
-				//pushConfiguration(content, out);
+				pushConfiguration(content, out);
         
 }
 }
