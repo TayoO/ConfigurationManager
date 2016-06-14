@@ -3,34 +3,94 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
+
 class ServerManager
 {
 	 static String path = "c:/temp/opentext.ini";
-	 
+	 static final int ARBITRARY_LIMIT=10;
  static SpecificMap groups= new SpecificMap<String, ServerGroup>();
  static SpecificMap servers= new SpecificMap<String, Server>();
  static SpecificMap globalSections= new SpecificMap<String, Section>();
- 
+ String [] groupNames;
  Server[] serverList;
+ String [] serverNames;
+ boolean [][] associations;
+
+static Scanner in = new Scanner(System.in);
+ 
 public static void main (String [] args) throws IOException
 {
-
-	String [] pushServers= new String [] {"epsilon","second","third", "fourth", "fifth"};
-	String [] changes=new String []  {"data,linkedList,double","seconddata,linkedList,double","thirddata,linkedList,double", "fourthdata,linkedList,double", "fifthdata,linkedList,double"};
 	
-//	globalSections.put("default", new Section ("title"));
+	int [] groupIndex;
+	
+			String [] pushServers= new String [] {"epsilon","second","third", "fourth", "fifth"};
+	String [] changes=new String []  {"data,linkedList,double,"+path,"seconddata,linkedList,double,"+path,"thirddata,linkedList,double,"+path, "fourthdata,linkedList,double,"+path, "fifthdata,linkedList,double,"+path};
+	//	globalSections.put("default", new Section ("title"));
 	ServerManager main= new ServerManager();
+	main.loadDefault();
 	main.pushConfiguration(pushServers, changes);
+	System.out.println("Do you want to push to groups?");
+	if(in.nextBoolean()==true){
+		System.out.println("How many groups?");
+		groupIndex = new int [in.nextInt()];
+		for (int i=0; i<groupIndex.length; i++){
+			groupIndex[i]=in.nextInt();
+		}
+		main.pushConfiguration(groupIndex, changes);
+	}
+	else 
+	{
+		main.pushConfiguration(pushServers,changes);
+	}
 
 
 }
-public void loadDefault(){
+
+/*
+file code:
+numGroups
+numServers
+listOfGroupNames seperated by commas
+ListOfServerNames seperated by commas
+numGroups lines each with list of servers indexes corresponding to respective groups seperated by commas
+Example]
+5
+6
+frontEnd, BackEnd, PWGSC, SSC, RCMP
+PWFE, PWBE, SSCFE, SSCBE, RCMPFE, RCMPBE
+1,3,5
+2,4,6
+1,2
+3,4
+5,6
+
+
+
+*/
+public void loadDefault(	) throws IOException, IOException{		
+	File Data=new File("U:\\test\\ServerList.csv");
+	try(BufferedReader br = new BufferedReader(new FileReader(Data))) {
+		System.out.println("wh");
+groupNames=new String [Integer.getInteger(br.readLine())];
+serverNames=new String [Integer.getInteger(br.readLine())];
+associations= new boolean [groupNames.length] [serverNames.length];
+groupNames=br.readLine().split(",");
+for (int i=0; i<groupNames.length; i++) {
+	String [] paringIndex=(br.readLine().split(","));
+	for (int j=0; j<paringIndex.length;j++){
+	associations[i] [Integer.getInteger(paringIndex[j])]=true;
+	}
+}
+
+	    
+	}
 	
 }
 public static Server addServer(String name, SpecificMap sect){
@@ -38,7 +98,6 @@ public static Server addServer(String name, SpecificMap sect){
 Server serv=new Server(name, sect);
 return serv;
 }
-
 public void addGroup(String name)
 {
 groups.put(name, new ServerGroup(name));
@@ -73,24 +132,34 @@ public void deleteServer(String serverName)
 {
 	groups.remove(serverName);
 }
-public void pushConfiguration(ServerGroup [] sg, Server [] server, String [] c ) throws IOException{
-	System.out.println("push sg server");
-	
-	SpecificMap allServ=new SpecificMap <String, Server>();
-	// Put and put all take into account duplicates for length
+public void pushConfiguration(int [] sg, String [] c ) throws IOException{
+	int counter;
+	LinkedList<String> uniqueServer= new LinkedList<String>();
+	boolean []  actualList=new boolean [serverNames.length];
+	for (int j=0; j<serverNames.length;j++){
+		for (int i=0; i<sg.length; i++)
+		{
+			if (associations[sg[i]][j])
+			{
+			actualList[j]=true;
 
-	for (int i=0; i<sg.length-2; i++){
-		allServ.putAll(sg[i].servers);
+			}
+		}
+		if(actualList[j])
+		{
+			uniqueServer.add(serverNames[j]);
+		}
+		
 	}
-	for (int i=0; i<server.length-2;i++){
-		allServ.put(server[i].name, server[i]);
-	}
-			
- String [] uniqueServers=new String[allServ.length];
+	System.out.println("push sg server");
+
+
+
+
 		 
-	for (int i=0; i<allServ.length;i++)
-	uniqueServers [i]=(String)allServ.keySet().iterator().next();
-	pushConfiguration(uniqueServers, c) ;
+
+
+	pushConfiguration((String [])uniqueServer.toArray(), c) ;
 }
 public void pushConfiguration( String [] servers, String []  change)throws IOException{
 	 File log = new File("U:\\test\\changes.csv");
@@ -119,10 +188,6 @@ public void pushConfiguration( String [] servers, String []  change)throws IOExc
 	    }
 
 }
-{
-
-		
-}
 public void pushConfiguration(String []line,  PrintWriter out)
 {
 	for (int i=0; i<line.length; i++){
@@ -135,37 +200,6 @@ public void pushConfiguration(String []line,  PrintWriter out)
 				    
 				    //more code
 } 
-			/*
-			BufferedReader br = new BufferedReader(new FileReader("U:\\test\\changes.csv"));
-		int counter=0;
-		 LinkedList<String>  sb= new LinkedList<String>();
-		while(br.!=null)
-		{
-		counter++;
-			   
-			    System.out.println("line num "+counter);
-			    sb.add(br.readLine()+System.lineSeparator());
-			    System.out.println("sb: "+sb.getFirst());
-			    line += br.readLine();
-
-		}
-			        		        
-			    
-
-		
-			    br.close();
-			
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-
-		
-			bw.append(sb.removeFirst());
-			bw.close();
-		    
-			System.out.println("Done");*/
-
-		
 public void pushConfiguration(String line,  PrintWriter out)
 {
 	
@@ -178,10 +212,9 @@ public void pushConfiguration(String line,  PrintWriter out)
 				    
 				    //more code
 }
-public void pushConfiguration(String line, boolean modify, PrintWriter out)
+public void pushConfiguration( boolean modify, PrintWriter out)
 {
 	//find a use for the boolean later
-	  Scanner in = new Scanner(System.in);
 		System.out.println("enter a server name, section variable and value");
 		 String server= in.nextLine();
 		 String section= in.nextLine();
