@@ -76,23 +76,59 @@ PWFE, PWBE, SSCFE, SSCBE, RCMPFE, RCMPBE
 */
 public void loadDefault(	) throws IOException, IOException{		
 	File Data=new File("U:\\test\\ServerList.csv");
-	try(BufferedReader br = new BufferedReader(new FileReader(Data))) {
-		System.out.println("wh");
-groupNames=new String [Integer.getInteger(br.readLine())];
-serverNames=new String [Integer.getInteger(br.readLine())];
-associations= new boolean [groupNames.length] [serverNames.length];
-groupNames=br.readLine().split(",");
-for (int i=0; i<groupNames.length; i++) {
-	String [] paringIndex=(br.readLine().split(","));
-	for (int j=0; j<paringIndex.length;j++){
-	associations[i] [Integer.getInteger(paringIndex[j])]=true;
-	}
-}
+
+    // The name of the file to open.
+    String fileName = "changes.csv";
+
+    // This will reference one line at a time
+    String line = null;
+
+    try {
+        // FileReader reads text files in the default encoding.
+        FileReader fileReader = 
+            new FileReader(fileName);
+
+        // Always wrap FileReader in BufferedReader.
+        BufferedReader br = 
+            new BufferedReader(fileReader);
+
+        while((line = br.readLine()) != null) {
+        	groupNames=new String [Integer.getInteger(br.readLine())];
+        	System.out.println(groupNames.length);
+        	serverNames=new String [Integer.getInteger(br.readLine())];
+        	System.out.println(serverNames.length);
+        	associations= new boolean [groupNames.length] [serverNames.length];
+        	groupNames=br.readLine().split(",");
+        	for (int i=0; i<groupNames.length; i++) {
+        		String [] paringIndex=(br.readLine().split(","));
+        		for (int j=0; j<paringIndex.length;j++){
+        		associations[i] [Integer.getInteger(paringIndex[j])]=true;
+        		}
+        	}
+
+        }   
+
+        // Always close files.
+        br.close();         
+    }
+    catch(FileNotFoundException ex) {
+        System.out.println(
+            "Unable to open file '" + 
+            fileName + "'");                
+    }
+    catch(IOException ex) {
+        System.out.println(
+            "Error reading file '" 
+            + fileName + "'");                  
+        // Or we could just do this: 
+        // ex.printStackTrace();
+    }
+
 
 	    
 	}
 	
-}
+
 public static Server addServer(String name, SpecificMap sect){
 
 Server serv=new Server(name, sect);
