@@ -75,10 +75,10 @@ PWFE, PWBE, SSCFE, SSCBE, RCMPFE, RCMPBE
 
 */
 public void loadDefault(	) throws IOException, IOException{		
-	File Data=new File("U:\\test\\ServerList.csv");
+
 
     // The name of the file to open.
-    String fileName = "changes.csv";
+    String fileName = "U:\\test\\ServerList.csv";
 
     // This will reference one line at a time
     String line = null;
@@ -91,22 +91,30 @@ public void loadDefault(	) throws IOException, IOException{
         // Always wrap FileReader in BufferedReader.
         BufferedReader br = 
             new BufferedReader(fileReader);
-
-        while((line = br.readLine()) != null) {
-        	groupNames=new String [Integer.getInteger(br.readLine())];
+            line =br.readLine();
+            groupNames=new String [ (int)Integer.parseInt(line)];
+        	
         	System.out.println(groupNames.length);
-        	serverNames=new String [Integer.getInteger(br.readLine())];
+        	line =br.readLine();
+        	serverNames=new String [ (int)Integer.parseInt(line)];
         	System.out.println(serverNames.length);
+        	
         	associations= new boolean [groupNames.length] [serverNames.length];
-        	groupNames=br.readLine().split(",");
+        	line =br.readLine();
+        	groupNames=line.split(",");
+        	line =br.readLine();
+        	serverNames=line.split(",");
         	for (int i=0; i<groupNames.length; i++) {
-        		String [] paringIndex=(br.readLine().split(","));
+        		System.out.println(groupNames[i]);
+        		line =br.readLine();
+        		String [] paringIndex=(line.split(","));
         		for (int j=0; j<paringIndex.length;j++){
-        		associations[i] [Integer.getInteger(paringIndex[j])]=true;
+        			System.out.println(paringIndex[j]);
+        		associations[i] [Integer.parseInt(paringIndex[j])-1]=true;
         		}
         	}
 
-        }   
+        
 
         // Always close files.
         br.close();         
