@@ -18,9 +18,9 @@ class ServerManager
  static SpecificMap groups= new SpecificMap<String, ServerGroup>();
  static SpecificMap servers= new SpecificMap<String, Server>();
  static SpecificMap globalSections= new SpecificMap<String, Section>();
- String [] groupNames;
+static String [] groupNames;
  Server[] serverList;
- String [] serverNames;
+ static String [] serverNames;
  boolean [][] associations;
 
 static Scanner in = new Scanner(System.in);
@@ -38,12 +38,18 @@ public static void main (String [] args) throws IOException
 	main.pushConfiguration(pushServers, changes);
 	System.out.println("Do you want to push to groups?");
 	if(in.nextBoolean()==true){
-		System.out.println("How many groups?");
+		for (int i=0; i<groupNames.length; i++)
+		{
+			System.out.println(i+ " "+groupNames[i]);
+		}
+		System.out.println("How many groups do you want to push to?");
+
 		groupIndex = new int [in.nextInt()];
+		System.out.println("enter the indexes of the groups");
 		for (int i=0; i<groupIndex.length; i++){
 			groupIndex[i]=in.nextInt();
 		}
-		main.pushConfiguration(groupIndex, changes);
+		main.pushConfiguration(changes, groupIndex);
 	}
 	else 
 	{
@@ -176,8 +182,8 @@ public void deleteServer(String serverName)
 {
 	groups.remove(serverName);
 }
-public void pushConfiguration(int [] sg, String [] c ) throws IOException{
-	int counter;
+public void pushConfiguration(String [] c, int ...sg ) throws IOException{
+	int counter=0;
 	LinkedList<String> uniqueServer= new LinkedList<String>();
 	boolean []  actualList=new boolean [serverNames.length];
 	for (int j=0; j<serverNames.length;j++){
@@ -191,19 +197,20 @@ public void pushConfiguration(int [] sg, String [] c ) throws IOException{
 		}
 		if(actualList[j])
 		{
+			counter++;
 			uniqueServer.add(serverNames[j]);
 		}
 		
 	}
 	System.out.println("push sg server");
 
-
+	 String [] array = uniqueServer.toArray(new String [counter]);
 
 
 		 
 
 
-	pushConfiguration((String [])uniqueServer.toArray(), c) ;
+	pushConfiguration(array, c) ;
 }
 public void pushConfiguration( String [] servers, String []  change)throws IOException{
 	 File log = new File("U:\\test\\changes.csv");
