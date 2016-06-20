@@ -14,16 +14,19 @@ import java.util.Scanner;
 class ServerManager
 {
 	 static String path = "c:/temp/opentext.ini";
-	 static final int ARBITRARY_LIMIT=10;
- static SpecificMap groups= new SpecificMap<String, ServerGroup>();
- static SpecificMap servers= new SpecificMap<String, Server>();
- static SpecificMap globalSections= new SpecificMap<String, Section>();
-static String [] groupNames;
- Server[] serverList;
- static String [] serverNames;
- boolean [][] associations;
 
+static String [] groupNames;
+ static String [] serverNames;
+
+//Which servers are in which groups
+ boolean [][] associations;
+ 
+//Allows input directly to Java
 static Scanner in = new Scanner(System.in);
+
+static SpecificMap groups= new SpecificMap<String, ServerGroup>();
+static SpecificMap servers= new SpecificMap<String, Server>();
+static SpecificMap globalSections= new SpecificMap<String, Section>();
  
 public static void main (String [] args) throws IOException
 {
@@ -97,25 +100,25 @@ public void loadDefault(	) throws IOException, IOException{
         // Always wrap FileReader in BufferedReader.
         BufferedReader br = 
             new BufferedReader(fileReader);
-            line =br.readLine();
-            groupNames=new String [ (int)Integer.parseInt(line)];
+
         	
-        	System.out.println(groupNames.length);
-        	line =br.readLine();
-        	serverNames=new String [ (int)Integer.parseInt(line)];
-        	System.out.println(serverNames.length);
         	
-        	associations= new boolean [groupNames.length] [serverNames.length];
         	line =br.readLine();
+        	System.out.println(line);
         	groupNames=line.split(",");
         	line =br.readLine();
         	serverNames=line.split(",");
+        	System.out.println(line);
+        			 // when group index i includes server index j, association i,j is true
+        	associations= new boolean [groupNames.length] [serverNames.length];
         	for (int i=0; i<groupNames.length; i++) {
-        		System.out.println(groupNames[i]);
+        		//
+        		//System.out.println(groupNames[i]);
         		line =br.readLine();
+        		System.out.println(line);
         		String [] paringIndex=(line.split(","));
         		for (int j=0; j<paringIndex.length;j++){
-        			System.out.println(paringIndex[j]);
+        			//System.out.println(paringIndex[j]);
         		associations[i] [Integer.parseInt(paringIndex[j])-1]=true;
         		}
         	}
@@ -134,8 +137,7 @@ public void loadDefault(	) throws IOException, IOException{
         System.out.println(
             "Error reading file '" 
             + fileName + "'");                  
-        // Or we could just do this: 
-        // ex.printStackTrace();
+
     }
 
 
