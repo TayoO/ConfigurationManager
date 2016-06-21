@@ -20,7 +20,7 @@ static String [] groupNames;
 
 //Which servers are in which groups
  boolean [][] associations;
- 
+ String [] groupInfo;
 //Allows input directly to Java
 static Scanner in = new Scanner(System.in);
 
@@ -101,26 +101,34 @@ public void loadDefault(	) throws IOException, IOException{
         BufferedReader br = 
             new BufferedReader(fileReader);
 
-        	
-        	
+       //unused Line
+        line =br.readLine();
+        
         	line =br.readLine();
         	System.out.println(line);
         	groupNames=line.split(",");
+        	
+        	//unsed Lines
+        	line =br.readLine();
+        	line =br.readLine();
+        	
         	line =br.readLine();
         	serverNames=line.split(",");
         	System.out.println(line);
+        	
+        	//unsed Lines
+        	line =br.readLine();
+        	line =br.readLine();
+        	
         			 // when group index i includes server index j, association i,j is true
-        	associations= new boolean [groupNames.length] [serverNames.length];
+        	
         	for (int i=0; i<groupNames.length; i++) {
         		//
         		//System.out.println(groupNames[i]);
         		line =br.readLine();
         		System.out.println(line);
-        		String [] paringIndex=(line.split(","));
-        		for (int j=0; j<paringIndex.length;j++){
-        			//System.out.println(paringIndex[j]);
-        		associations[i] [Integer.parseInt(paringIndex[j])-1]=true;
-        		}
+        		groups.put(groupNames[i], new ServerGroup (groupNames[i],(line.split(","))));
+
         	}
 
         
@@ -187,13 +195,13 @@ public void deleteServer(String serverName)
 public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 	int counter=0;
 	LinkedList<String> uniqueServer= new LinkedList<String>();
+	StringBuilder sb;
+	
 	boolean []  actualList=new boolean [serverNames.length];
-	for (int j=0; j<serverNames.length;j++){
+
 		for (int i=0; i<sg.length; i++)
 		{
-			if (associations[sg[i]][j])
-			{
-			actualList[j]=true;
+			(servers) groups.get(sg[i]).get;
 
 			}
 		}
@@ -203,7 +211,7 @@ public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 			uniqueServer.add(serverNames[j]);
 		}
 		
-	}
+	
 	System.out.println("push sg server");
 
 	 String [] array = uniqueServer.toArray(new String [counter]);

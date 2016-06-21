@@ -15,9 +15,17 @@ public ServerGroup (String name, Server [] servers)
 this.name=name;
 for (int i=0; i<servers.length; i++)
 {
-	this.name=name;
-	servers[i].addSection(groupSections);
+
 	this.servers.put(servers[i].name,servers [i]);
+}
+}
+public ServerGroup (String name, String [] serverNames)
+{
+this.name=name;
+for (int i=0; i<serverNames.length; i++)
+{
+	servers.put (serverNames[i], new Server(serverNames[i]));
+
 }
 }
 
@@ -51,7 +59,7 @@ public String toString()
 {System.out.println("toString"+name);
 	 StringBuilder sb = new StringBuilder();
 sb.append("["+name+"]");
-{System.out.println("toString"+name);
+System.out.println("toString"+name);
 String prints;
 
 prints=servers.toString();
@@ -61,6 +69,7 @@ prints=servers.toString();
 
 
 	return sb.toString();
+
 }
-}
+
 }
