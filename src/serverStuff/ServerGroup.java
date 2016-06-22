@@ -55,6 +55,15 @@ public void setName(String name)
 {
 	this.name=name;
 }
+
+public Server [] getServers(){
+return (Server []) servers.entrySet().toArray();
+}
+
+public String [] getServerNames(){
+return (String []) servers.keySet().toArray();
+}
+
 public String toString()
 {System.out.println("toString"+name);
 	 StringBuilder sb = new StringBuilder();

@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 class ServerManager
@@ -194,22 +196,21 @@ public void deleteServer(String serverName)
 }
 public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 	int counter=0;
-	LinkedList<String> uniqueServer= new LinkedList<String>();
+	PriorityQueue<String> uniqueServer= new PriorityQueue<String>();
 	StringBuilder sb;
-	
+
 	boolean []  actualList=new boolean [serverNames.length];
-
+//Server [] 
 		for (int i=0; i<sg.length; i++)
+			
 		{
-			(servers) groups.get(sg[i]).get;
+			String [] unfiltered=( ((ServerGroup) groups.get(sg[i])).getServerNames());
+			for (int j=0; j<unfiltered.length;i++ )
+			uniqueServer.add(unfiltered[j]);
 
-			}
+			
 		}
-		if(actualList[j])
-		{
-			counter++;
-			uniqueServer.add(serverNames[j]);
-		}
+		
 		
 	
 	System.out.println("push sg server");
@@ -255,7 +256,6 @@ public void pushConfiguration(String []line,  PrintWriter out)
 		
 
 				    out.println(line[i]+"\r\n");
-				    out.append("sup");
 	} 
 				    //more code
 				    
