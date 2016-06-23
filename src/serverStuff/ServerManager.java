@@ -128,9 +128,9 @@ public void loadDefault(	) throws IOException, IOException{
         		//
         		//System.out.println(groupNames[i]);
         		line =br.readLine();
-        		System.out.println(line);
+        		System.out.println("pushing"+line);
         		groups.put(groupNames[i], new ServerGroup (groupNames[i],(line.split(","))));
-
+        		System.out.println(groups.get(groupNames[i]));
         	}
 
         
@@ -204,6 +204,7 @@ public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 		for (int i=0; i<sg.length; i++)
 			
 		{
+			System.out.println( "wetr"+groups.get(sg[i]));
 			String [] unfiltered=( ((ServerGroup) groups.get(sg[i])).getServerNames());
 			for (int j=0; j<unfiltered.length;i++ )
 			uniqueServer.add(unfiltered[j]);
