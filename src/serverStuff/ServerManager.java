@@ -7,6 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
@@ -204,8 +208,16 @@ public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 		for (int i=0; i<sg.length; i++)
 			
 		{
-			System.out.println( "wetr"+groups.get(sg[i]));
-			String [] unfiltered=( ((ServerGroup) groups.get(sg[i])).getServerNames());
+			groups.toString();
+			//groups.put(sg[i],new ServerGroup(sg[i]));
+			;System.out.println( "sg[i]"+sg[i]+"grw"+groups.get(serverNames[sg[i]]));
+			groups.put("erge", new ServerGroup("fwe"));
+			
+			ServerGroup g=((ServerGroup) groups.get("erge"));
+			
+					System.out.println(g.toString());
+					
+			String [] unfiltered=( g.getServerNames());
 			for (int j=0; j<unfiltered.length;i++ )
 			uniqueServer.add(unfiltered[j]);
 
@@ -223,6 +235,7 @@ public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 
 
 	pushConfiguration(array, c) ;
+	System.out.println("push sg server done");
 }
 public void pushConfiguration( String [] servers, String []  change)throws IOException{
 	 File log = new File("U:\\test\\changes.csv");
@@ -232,22 +245,25 @@ public void pushConfiguration( String [] servers, String []  change)throws IOExc
 	            log.createNewFile();
 	    }
 	    PrintWriter out = new PrintWriter(new FileWriter(log, true));
+	    ArrayList x= new ArrayList<String>(servers.length*change.length);
 	    for (int i=0; i<servers.length; i++)
 		{
 			for (int j=0; j<change.length; j++){
 				System.out.println(servers[i]+","+change[j]);
 				 //line[i*change.length+j]= 
-				out.append(servers[i]+","+change[j]+"\r\n");
+				x.add(servers[i]+","+change[j]);
 				System.out.println(servers[i]+","+change[j]);
 				
 			}
 			
+			Files.write(Paths.get("U:\\test\\changes.csv"),x,Charset.forName("UTF-8"));
+		
 		}
 	    
 	    out.close();
 	    }catch(IOException e)
 	    {
-	        System.out.println("COULD NOT LOG!!");
+	        System.out.println("--COULD NOT LOG!!");
 	    }
 
 }

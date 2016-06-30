@@ -3,8 +3,8 @@ package serverStuff;
 
 class ServerGroup{
 private String name;
-SpecificMap servers= new SpecificMap<String, Server>();
-SpecificMap groupSections= new SpecificMap<String, Section>();
+SpecificMap<String, Server> servers= new SpecificMap<String, Server>();
+SpecificMap<String, Section> groupSections= new SpecificMap<String, Section>();
 public ServerGroup (String name)
 {
 this.name=name;
@@ -33,10 +33,10 @@ public void addServers( Server[]serv)
 {
 	for (int i=0; i<servers.length; i++)
 	{
-	servers.put(serv[i].name, serv);
+	servers.put(serv[i].name,  serv[i]);
 	}
 }
-public void addServers( SpecificMap m)
+public void addServers( SpecificMap<String, ?> m)
 {
 	for (int i=0; i<servers.length; i++)
 	{
@@ -61,7 +61,13 @@ return (Server []) servers.entrySet().toArray();
 }
 
 public String [] getServerNames(){
-return (String []) servers.keySet().toArray();
+	String [] test=new String [servers.length];
+	test=(String [])   servers.keySet().toArray(test);
+	if (test.equals(null))
+	{
+		test=(new  String[] {"error"});
+	}
+return test;
 }
 
 public String toString()
