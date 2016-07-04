@@ -44,9 +44,10 @@ public static void main (String [] args) throws IOException
 	//	globalSections.put("default", new Section ("title"));
 	ServerManager main= new ServerManager();
 	main.loadDefault();
+	System.out.println("loaded?");
 	main.pushConfiguration(pushServers, changes);
-	System.out.println("Do you want to push to groups?");
-	if(in.nextBoolean()==true){
+	System.out.println("Do you) want to push to groups?");
+	if(in.nextBoolean()==true{
 		for (int i=0; i<groupNames.length; i++)
 		{
 			System.out.println(i+ " "+groupNames[i]);
@@ -60,10 +61,7 @@ public static void main (String [] args) throws IOException
 		}
 		main.pushConfiguration(changes, groupIndex);
 	}
-	else 
-	{
-		main.pushConfiguration(pushServers,changes);
-	}
+
 
 
 }
@@ -263,7 +261,7 @@ public void pushConfiguration( String [] servers, String []  change)throws IOExc
 	    out.close();
 	    }catch(IOException e)
 	    {
-	        System.out.println("--COULD NOT LOG!!");
+	        System.out.println("--COULD NOT LOG!!"+e.getMessage());
 	    }
 
 }
