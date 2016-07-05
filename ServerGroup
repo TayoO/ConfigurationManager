@@ -1,4 +1,0 @@
-Class ServerGroup{
-String name
-Server [] groupMembers;
-}

@@ -11,12 +11,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Scanner;
-
+import javax.sql.*;
 class ServerManager
 {
 	 static String path = "c:/temp/opentext.ini";
@@ -45,9 +42,9 @@ public static void main (String [] args) throws IOException
 	ServerManager main= new ServerManager();
 	main.loadDefault();
 	System.out.println("loaded?");
-	main.pushConfiguration(pushServers, changes);
-	System.out.println("Do you) want to push to groups?");
-	if(in.nextBoolean()==true{
+	//main.pushConfiguration(pushServers, changes);
+	System.out.println("Do you want to push to groups?");
+	if(in.nextBoolean()==true){
 		for (int i=0; i<groupNames.length; i++)
 		{
 			System.out.println(i+ " "+groupNames[i]);
@@ -61,7 +58,10 @@ public static void main (String [] args) throws IOException
 		}
 		main.pushConfiguration(changes, groupIndex);
 	}
-
+	else 
+	{
+		main.pushConfiguration(pushServers,changes);
+	}
 
 
 }

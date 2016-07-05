@@ -1,5 +1,0 @@
-Class Variable
-{
-String fieldName;
-String value;
-}
