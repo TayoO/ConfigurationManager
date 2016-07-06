@@ -7,31 +7,30 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.PriorityQueue;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Scanner;
-import javax.sql.*;
+
 class ServerManager
 {
 	 static String path = "c:/temp/opentext.ini";
-
+	 static final int ARBITRARY_LIMIT=10;
+ static SpecificMap groups= new SpecificMap<String, ServerGroup>();
+ static SpecificMap servers= new SpecificMap<String, Server>();
+ static SpecificMap globalSections= new SpecificMap<String, Section>();
 static String [] groupNames;
+ Server[] serverList;
  static String [] serverNames;
-
-//Which servers are in which groups
  boolean [][] associations;
- String [] groupInfo;
-//Allows input directly to Java
-static Scanner in = new Scanner(System.in);
 
-static SpecificMap groups= new SpecificMap<String, ServerGroup>();
-static SpecificMap servers= new SpecificMap<String, Server>();
-static SpecificMap globalSections= new SpecificMap<String, Section>();
+static Scanner in = new Scanner(System.in);
  
-public static void main (String [] args) throws IOException
+public static void main (String [] args) throws IOException, SQLException
 {
 	
 	int [] groupIndex;
@@ -41,8 +40,7 @@ public static void main (String [] args) throws IOException
 	//	globalSections.put("default", new Section ("title"));
 	ServerManager main= new ServerManager();
 	main.loadDefault();
-	System.out.println("loaded?");
-	//main.pushConfiguration(pushServers, changes);
+	main.pushConfiguration(pushServers, changes);
 	System.out.println("Do you want to push to groups?");
 	if(in.nextBoolean()==true){
 		for (int i=0; i<groupNames.length; i++)
@@ -83,15 +81,59 @@ PWFE, PWBE, SSCFE, SSCBE, RCMPFE, RCMPBE
 1,2
 3,4
 5,6
-
-
-
 */
-public void loadDefault(	) throws IOException, IOException{		
+public void loadDefault(	) throws IOException, SQLException {
+	  
+    
+    Connection c = null;
+    Statement stmt = null;
+    try {
+      Class.forName("org.sqlite.JDBC");
+      c = DriverManager.getConnection("jdbc:sqlite:test.db");
+      System.out.println("Opened database successfully");
+
+      stmt = c.createStatement();
+      String sql;		
+      		sql="CREATE TABLE Server " +
+                   "(ID INT PRIMARY KEY     NOT NULL," +
+                   " NAME           char(32)    NOT NULL, " + 
+                   " Type           char(3)     NOT NULL, " + 
+                   " Department      char(10), " + 
+                   " CIF       INT, " + 
+                   " IP        CHAR(30)        )"; 
+      stmt.executeUpdate(sql);
+      sql = "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
+              "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"+
+      "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
+      "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"+ 
+      "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
+      "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"+ 
+      "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
+      "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"+
+      "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
+      "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"; 
+ stmt.executeUpdate(sql);
+      sql ="Select * from Server where type =\"FE\";";
+      		ResultSet rs=stmt.executeQuery(sql);
+      		while (rs.next())
+      		{
+      			System.out.println(rs.getInt("id"));
+      			System.out.println(rs.getString("name"));
+      			System.out.println(rs.getString("type"));
+      		}
+      stmt.close();
+      c.close();
+    } catch ( Exception e ) {
+      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+      System.exit(0);
+    }
+    System.out.println("Table created successfully");
+}
+/*IOException{		
 
 
     // The name of the file to open.
-    String fileName = "U:\\test\\ServerList.csv";
+    String fileName = "U:\\test\\ServerList2.csv";
 
     // This will reference one line at a time
     String line = null;
@@ -104,35 +146,22 @@ public void loadDefault(	) throws IOException, IOException{
         // Always wrap FileReader in BufferedReader.
         BufferedReader br = 
             new BufferedReader(fileReader);
-
-       //unused Line
-        line =br.readLine();
-        
-        	line =br.readLine();
-        	System.out.println(line);
+          
+        	line =br.readLine(); 
         	groupNames=line.split(",");
-        	
-        	//unsed Lines
-        	line =br.readLine();
-        	line =br.readLine();
-        	
+        	System.out.println("er" +groupNames.length);
         	line =br.readLine();
         	serverNames=line.split(",");
-        	System.out.println(line);
-        	
-        	//unsed Lines
-        	line =br.readLine();
-        	line =br.readLine();
-        	
-        			 // when group index i includes server index j, association i,j is true
-        	
+        	System.out.println(line+"er" +serverNames.length);
+        	associations= new boolean [groupNames.length] [serverNames.length];
         	for (int i=0; i<groupNames.length; i++) {
-        		//
-        		//System.out.println(groupNames[i]);
+        		System.out.println(groupNames[i]);
         		line =br.readLine();
-        		System.out.println("pushing"+line);
-        		groups.put(groupNames[i], new ServerGroup (groupNames[i],(line.split(","))));
-        		System.out.println(groups.get(groupNames[i]));
+        		String [] paringIndex=(line.split(","));
+        		for (int j=0; j<paringIndex.length;j++){
+        			System.out.println(paringIndex[j]);
+        		associations[i] [Integer.parseInt(paringIndex[j])-1]=true;
+        		}
         	}
 
         
@@ -149,12 +178,13 @@ public void loadDefault(	) throws IOException, IOException{
         System.out.println(
             "Error reading file '" 
             + fileName + "'");                  
-
+        // Or we could just do this: 
+        // ex.printStackTrace();
     }
 
 
 	    
-	}
+	}*/
 	
 
 public static Server addServer(String name, SpecificMap sect){
@@ -198,32 +228,24 @@ public void deleteServer(String serverName)
 }
 public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 	int counter=0;
-	PriorityQueue<String> uniqueServer= new PriorityQueue<String>();
-	StringBuilder sb;
-
+	LinkedList<String> uniqueServer= new LinkedList<String>();
 	boolean []  actualList=new boolean [serverNames.length];
-//Server [] 
+	for (int j=0; j<serverNames.length;j++){
 		for (int i=0; i<sg.length; i++)
-			
 		{
-			groups.toString();
-			//groups.put(sg[i],new ServerGroup(sg[i]));
-			;System.out.println( "sg[i]"+sg[i]+"grw"+groups.get(serverNames[sg[i]]));
-			groups.put("erge", new ServerGroup("fwe"));
-			
-			ServerGroup g=((ServerGroup) groups.get("erge"));
-			
-					System.out.println(g.toString());
-					
-			String [] unfiltered=( g.getServerNames());
-			for (int j=0; j<unfiltered.length;i++ )
-			uniqueServer.add(unfiltered[j]);
+			if (associations[sg[i]][j])
+			{
+			actualList[j]=true;
 
-			
+			}
+		}
+		if(actualList[j])
+		{
+			counter++;
+			uniqueServer.add(serverNames[j]);
 		}
 		
-		
-	
+	}
 	System.out.println("push sg server");
 
 	 String [] array = uniqueServer.toArray(new String [counter]);
@@ -233,35 +255,31 @@ public void pushConfiguration(String [] c, int ...sg ) throws IOException{
 
 
 	pushConfiguration(array, c) ;
-	System.out.println("push sg server done");
 }
 public void pushConfiguration( String [] servers, String []  change)throws IOException{
-	 File log = new File("U:\\test\\changes.csv");
+	 File log = new File("U:\\test\\changes2.csv");
 	    try{
 	    if(log.exists()==false){
 	            System.out.println("We had to make a new file.");
 	            log.createNewFile();
 	    }
 	    PrintWriter out = new PrintWriter(new FileWriter(log, true));
-	    ArrayList x= new ArrayList<String>(servers.length*change.length);
 	    for (int i=0; i<servers.length; i++)
 		{
 			for (int j=0; j<change.length; j++){
 				System.out.println(servers[i]+","+change[j]);
 				 //line[i*change.length+j]= 
-				x.add(servers[i]+","+change[j]);
+				out.append(servers[i]+","+change[j]+"\r\n");
 				System.out.println(servers[i]+","+change[j]);
 				
 			}
 			
-			Files.write(Paths.get("U:\\test\\changes.csv"),x,Charset.forName("UTF-8"));
-		
 		}
 	    
 	    out.close();
 	    }catch(IOException e)
 	    {
-	        System.out.println("--COULD NOT LOG!!"+e.getMessage());
+	        System.out.println("COULD NOT LOG!! :"+ e.getMessage());
 	    }
 
 }
@@ -271,6 +289,7 @@ public void pushConfiguration(String []line,  PrintWriter out)
 		
 
 				    out.println(line[i]+"\r\n");
+				    out.append("sup");
 	} 
 				    //more code
 				    
