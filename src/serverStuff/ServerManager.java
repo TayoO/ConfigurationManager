@@ -101,8 +101,28 @@ public void loadDefault(	) throws IOException, SQLException {
                    " Department      char(10), " + 
                    " CIF       INT, " + 
                    " IP        CHAR(30)        )"; 
-      stmt.executeUpdate(sql);
-      sql = "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
+      //stmt.executeUpdate(sql);
+     int index;
+      int name=629;
+      int offset=1;
+      String [] type={"DB","FE","BE","AG","AD"};
+      String [] group={"GCDOCS","PWGSC", "VAC","SSC","RCMP"};
+      
+      StringBuilder sb=new StringBuilder();
+      for (index=1; index<200; index++)
+    	  
+      {
+    	  String depart=group[(int) Math.floor(Math.random()*5)];
+    	 String serverType=type[(int) Math.floor(Math.random()*5)];
+    	
+      String line=("insert or replace INTO SERVER (ID,NAME,Type,Department ,CIF, IP) VALUES ("+index+",'"+depart +(100+index)+"','"+serverType+"','"+depart+"','" +"null"+"','"+"100.121.194."+index+"');");
+    	System.out.println(line);
+      sb.append(line);
+      }
+      //sb.append(");");
+      sql = sb.toString();
+      System.out.println(sql);
+    		  /*"INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
               "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"+
       "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
       "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"+ 
@@ -112,11 +132,16 @@ public void loadDefault(	) throws IOException, SQLException {
       "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"+
       "INSERT INTO SERVER (ID,NAME,Type,Department ,CIF, IP) " +
       "VALUES (13, 'GCDOCS-5000629', 'DB', 'GCDOCS', 1, 100-121-194-254 );"; 
- stmt.executeUpdate(sql);
-      sql ="Select * from Server where type =\"FE\";";
+      */
+      stmt.executeUpdate(sql);
+      System.out.println("Results:");
+      sql ="Select * from Server where type =\'FE\';";
+     
       		ResultSet rs=stmt.executeQuery(sql);
+      		 System.out.println("Results:"+rs.next());
       		while (rs.next())
       		{
+      			System.out.println("Results:");
       			System.out.println(rs.getInt("id"));
       			System.out.println(rs.getString("name"));
       			System.out.println(rs.getString("type"));
