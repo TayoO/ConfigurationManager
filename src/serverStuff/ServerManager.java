@@ -210,7 +210,10 @@ public void loadDefault(	) throws IOException, SQLException {
 
 	    
 	}*/
-	
+public void request()
+{
+	//
+}
 
 public static Server addServer(String name, SpecificMap sect){
 
