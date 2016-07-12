@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
@@ -28,6 +29,7 @@ static String [] groupNames;
  static String [] serverNames;
  boolean [][] associations;
 
+
 static Scanner in = new Scanner(System.in);
  
 public static void main (String [] args) throws IOException, SQLException
@@ -40,29 +42,56 @@ public static void main (String [] args) throws IOException, SQLException
 	//	globalSections.put("default", new Section ("title"));
 	ServerManager main= new ServerManager();
 	main.loadDefault();
-	main.pushConfiguration(pushServers, changes);
+	 String [] chosenServers = null;	
+
 	System.out.println("Do you want to push to groups?");
 	if(in.nextBoolean()==true){
-		for (int i=0; i<groupNames.length; i++)
-		{
-			System.out.println(i+ " "+groupNames[i]);
+		
+		System.out.println("How many departments?");
+	String [] departs=new String [in.nextInt()];
+	
+	
+		for (int i=0; i<departs.length; i++){
+			
+		System.out.println("enter the next department name");
+		departs[i]= in.next();
 		}
-		System.out.println("How many groups do you want to push to?");
-
-		groupIndex = new int [in.nextInt()];
-		System.out.println("enter the indexes of the groups");
-		for (int i=0; i<groupIndex.length; i++){
-			groupIndex[i]=in.nextInt();
+		System.out.println("how many server types?");
+		String [] types=new String [in.nextInt()];
+		for (int i=0; i<types.length; i++){
+			
+		System.out.println("enter the  type names");
+		types[i]= in.next();
+		
 		}
-		main.pushConfiguration(changes, groupIndex);
+		chosenServers=main.getGroups(departs, types);
+	     
+  		
 	}
-	else 
-	{
-		main.pushConfiguration(pushServers,changes);
+	
+		//System.out.println("What server names do you want to push to");
+	
+
+		
+		System.out.println("how many changes do you want to push");
+		changes= new String[in.nextInt()];
+		String section;
+		String variable;
+		String value;
+		for (int i=0; i<changes.length; i++){
+			System.out.println("Which section?");
+			section=in.nextLine();
+			System.out.println("Which variable?");
+			variable=in.nextLine();
+			System.out.println("What value are you setting it too?");
+			value=in.nextLine();
+		changes[i]=section+","+variable+","+value+","+path;
+		}
+ main.pushConfiguration(chosenServers, changes);
 	}
+	
 
 
-}
 
 /*
 file code:
@@ -82,6 +111,41 @@ PWFE, PWBE, SSCFE, SSCBE, RCMPFE, RCMPBE
 3,4
 5,6
 */
+public String [] getGroups(String [] departs, String [] type){
+	Connection c = null;
+    Statement stmt = null;
+    ArrayList <String>names = null;
+    try {
+      Class.forName("org.sqlite.JDBC");
+      c = DriverManager.getConnection("jdbc:sqlite:test.db");
+      stmt = c.createStatement();
+      for (int i=0; i<departs.length; i++){
+    	  for (int j=0; j<departs.length; j++){
+    		  
+    	  
+      String sql="Select NAME from Server where type =\'"+departs[i]+"\'=\'"+type[j]+"\';";		
+      stmt.executeUpdate(sql);
+      System.out.println("hello");
+     
+  
+ 		ResultSet rs=stmt.executeQuery(sql);
+ 		 System.out.println("Results:"+rs.next());
+ 		while (rs.next())
+ 		{
+ 			System.out.println("Results:");
+ 			System.out.println(rs.getInt("id"));
+ 			String x=rs.getString("name");
+ 			System.out.println(x);
+ 			names.add(x);
+ 			System.out.println(rs.getString("type"));
+ 		}      }
+    }
+    }catch ( Exception e ) {
+        System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+        System.exit(0);
+      }
+	return (String[]) names.toArray();
+}
 public void loadDefault(	) throws IOException, SQLException {
 	  
     
