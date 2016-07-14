@@ -31,6 +31,7 @@ static String [] groupNames;
 
 
 static Scanner in = new Scanner(System.in);
+private ArrayList <String> names;
  
 public static void main (String [] args) throws IOException, SQLException
 {
@@ -78,6 +79,8 @@ public static void main (String [] args) throws IOException, SQLException
 		String section;
 		String variable;
 		String value;
+		System.out.close();
+		 
 		for (int i=0; i<changes.length; i++){
 			System.out.println("Which section?");
 			section=in.nextLine();
@@ -107,14 +110,14 @@ frontEnd, BackEnd, PWGSC, SSC, RCMP
 PWFE, PWBE, SSCFE, SSCBE, RCMPFE, RCMPBE
 1,3,5
 2,4,6
-1,2
-3,4
+1,2h
 5,6
 */
 public String [] getGroups(String [] departs, String [] type){
 	Connection c = null;
     Statement stmt = null;
-    ArrayList <String>names = null;
+   ArrayList <String> names=new ArrayList<String>();
+   int counter=0;
     try {
       Class.forName("org.sqlite.JDBC");
       c = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -122,29 +125,36 @@ public String [] getGroups(String [] departs, String [] type){
       for (int i=0; i<departs.length; i++){
     	  for (int j=0; j<departs.length; j++){
     		  
-    	  
-      String sql="Select NAME from Server where type =\'"+departs[i]+"\'=\'"+type[j]+"\';";		
+    		  
+      String sql="Select * from Server where Department =\'"+departs[i]+"\'and Type=\'"+type[j]+"\';";		
+      //sql="Select * from Server ;";
+      System.out.println("pre update");
       stmt.executeUpdate(sql);
-      System.out.println("hello");
+      System.out.println("post update");
      
-  
+ 
  		ResultSet rs=stmt.executeQuery(sql);
  		 System.out.println("Results:"+rs.next());
  		while (rs.next())
  		{
  			System.out.println("Results:");
  			System.out.println(rs.getInt("id"));
+ 			System.out.println("after id");
  			String x=rs.getString("name");
  			System.out.println(x);
- 			names.add(x);
+ 			if( names.add(x));
+ 			counter++;
+ 			System.out.println("pre type");
  			System.out.println(rs.getString("type"));
+ 			System.out.println("after type");
  		}      }
     }
     }catch ( Exception e ) {
         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
         System.exit(0);
       }
-	return (String[]) names.toArray();
+    String [] exampleArray = new String [counter];
+	return (String[]) names.toArray(exampleArray);
 }
 public void loadDefault(	) throws IOException, SQLException {
 	  
