@@ -1,11 +1,9 @@
 package serverStuff;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,8 +12,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Scanner;
+
 
 class ServerManager
 {
@@ -79,7 +77,7 @@ public static void main (String [] args) throws IOException, SQLException
 		String section;
 		String variable;
 		String value;
-		System.out.close();
+		//System.out.close();
 		 
 		for (int i=0; i<changes.length; i++){
 			System.out.println("Which section?");
@@ -91,8 +89,23 @@ public static void main (String [] args) throws IOException, SQLException
 		changes[i]=section+","+variable+","+value+","+path;
 		}
  main.pushConfiguration(chosenServers, changes);
+ 
+	 Runtime runtime = Runtime.getRuntime();
+	 Process proc = (Process) runtime.exec("powershell D:\\inichangeremote.ps1");
+	 BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+	 System.out.println("Powershell:");
+		 System.out.println(br.readLine());
+		 
+	 
+	 
+	   
+	    
+	    
+
+	 proc.getOutputStream().close();
 	}
-	
+
+//
 
 
 
