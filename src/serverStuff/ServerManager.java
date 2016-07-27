@@ -12,13 +12,14 @@
 		import java.sql.Statement;
 		import java.util.ArrayList;
 		import java.util.Scanner;
-		
+		import java.awt.*;
+		import javax.swing.*;
 		
 		class ServerManager
 		{
 			 static String path = "c:/temp/opentext.ini";
 			static final int ARBITRARY_LIMIT=10;
-		
+		String powershell="powershell C:\\Users\\oduekea\\workspace\\shelltest.ps1";
 		static String [] groupNames;
 		 Server[] serverList;
 		 static String [] serverNames;
@@ -34,7 +35,8 @@
 			//main.loadDefault();
 			 String [] chosenServers = null;	
 			 String [] changes;
-		
+		System.out.println("powerscript path listed as"+main.powershell);
+		main.powershell=in.next();
 			System.out.println("Do you want to push to groups?");
 			if(in.nextBoolean()==true){
 				
@@ -88,7 +90,7 @@
 		 main.pushConfiguration(chosenServers, changes);
 		 
 			 Runtime runtime = Runtime.getRuntime();
-			 Process proc = (Process) runtime.exec("powershell C:\\Users\\oduekea\\workspace\\shelltest.ps1");
+			 Process proc = (Process) runtime.exec(main.powershell);
 			 
 			 BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			 System.out.println("Powershell:");
@@ -262,3 +264,4 @@
 						    out.append("sup");
 		}
 		}
+		
