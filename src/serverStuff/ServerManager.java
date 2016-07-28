@@ -89,20 +89,14 @@
 				}
 		 main.pushConfiguration(chosenServers, changes);
 		 
+		 //This triggers the powershell script so it can implement the changes made in the file
 			 Runtime runtime = Runtime.getRuntime();
 			 Process proc = (Process) runtime.exec(main.powershell);
-			 
+		//Prints out the powershell output
 			 BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			 System.out.println("Powershell:");
 				 System.out.println(br.readLine());
-				 
-			 
-			 
-			   
-			    
-			    
-		
-			 proc.getOutputStream().close();
+	proc.getOutputStream().close();
 			}
 		
 		//
@@ -127,16 +121,19 @@
 		5,6
 		*/
 		public String [] getGroups(String [] departs, String [] type){
+			//Variables for sql connection
 			Connection c = null;
 		    Statement stmt = null;
+		    //array list for srry of unknown size, regular arrays slow to append
 		   ArrayList <String> names=new ArrayList<String>();
 		   int counter=0;
 		    try {
 		      Class.forName("org.sqlite.JDBC");
 		      c = DriverManager.getConnection("jdbc:sqlite:test.db");
 		      stmt = c.createStatement();
+		      // For each department and type combination there is a unique search
 		      for (int i=0; i<departs.length; i++){
-		    	  for (int j=0; j<departs.length; j++){
+		    	  for (int j=0; j<type.length; j++){
 		    		  
 		    		  
 		      String sql="Select * from Server where Department =\'"+departs[i]+"\'and Type=\'"+type[j]+"\';";		
@@ -155,7 +152,7 @@
 		 			System.out.println("after id");
 		 			String x=rs.getString("name");
 		 			System.out.println(x);
-		 			if( names.add(x));
+		 			if( names.add(x))
 		 			counter++;
 		 			System.out.println("pre type");
 		 			System.out.println(rs.getString("type"));
@@ -166,70 +163,12 @@
 		        System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		        System.exit(0);
 		      }
+		    //Examplearray for array format
 		    String [] exampleArray = new String [counter];
 			return (String[]) names.toArray(exampleArray);
 		}
-		/*
-		public void loadDefault(	) throws IOException, SQLException {
-			  
-		    
-		    Connection c = null;
-		    Statement stmt = null;
-		    try {
-		      Class.forName("org.sqlite.JDBC");
-		      c = DriverManager.getConnection("jdbc:sqlite:test.db");
-		      System.out.println("Opened database successfully");
-		
-		      stmt = c.createStatement();
-		      String sql;		
-		      		sql="CREATE TABLE Server " +
-		                   "(ID INT PRIMARY KEY     NOT NULL," +
-		                   " NAME           char(32)    NOT NULL, " + 
-		                   " Type           char(3)     NOT NULL, " + 
-		                   " Department      char(10), " + 
-		                   " CIF       INT, " + 
-		                   " IP        CHAR(30)        )"; 
-		      //stmt.executeUpdate(sql);
-		     int index;
-		      String [] type={"DB","FE","BE","AG","AD"};
-		      String [] group={"GCDOCS","PWGSC", "VAC","SSC","RCMP"};
-		      
-		      StringBuilder sb=new StringBuilder();
-		      for (index=1; index<200; index++)
-		    	  
-		      {
-		    	  String depart=group[(int) Math.floor(Math.random()*5)];
-		    	 String serverType=type[(int) Math.floor(Math.random()*5)];
-		    	
-		      String line=("insert or replace INTO SERVER (ID,NAME,Type,Department ,CIF, IP) VALUES ("+index+",'"+depart +(100+index)+"','"+serverType+"','"+depart+"','" +"null"+"','"+"100.121.194."+index+"');");
-		      sb.append(line);
-		      }
-		      //sb.append(");");
-		      sql = sb.toString();
-		      System.out.println(sql);
-		      stmt.executeUpdate(sql);
-		      System.out.println("Results:");
-		      sql ="Select * from Server where type =\'FE\';";
-		     
-		      		ResultSet rs=stmt.executeQuery(sql);
-		      		 System.out.println("Results:"+rs.next());
-		      		while (rs.next())
-		      		{
-		      			System.out.println("Results:");
-		      			System.out.println(rs.getInt("id"));
-		      			System.out.println(rs.getString("name"));
-		      			System.out.println(rs.getString("type"));
-		      		}
-		      stmt.close();
-		      c.close();
-		    } catch ( Exception e ) {
-		      System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		      System.exit(0);
-		    }
-		    System.out.println("Table created successfully");
-		}
-		*/
-		
+
+		// Combines the server info with changes than passes it on to push line by line 
 		public void pushConfiguration( String [] servers, String []  change)throws IOException{
 			 File log = new File("U:\\test\\changes2.csv");
 			    try{
@@ -240,7 +179,8 @@
 			    PrintWriter out = new PrintWriter(new FileWriter(log, true));
 			    for (int i=0; i<servers.length; i++)
 				{
-					for (int j=0; j<change.length; j++){
+					for (int j=0; j<change.length; j++)
+					{
 						System.out.println(servers[i]+","+change[j]);
 						 //line[i*change.length+j]= 
 						out.append(servers[i]+","+change[j]+"\r\n");
@@ -251,17 +191,19 @@
 				}
 			    
 			    out.close();
-			    }catch(IOException e)
+			    }
+			    catch(IOException e)
 			    {
 			        System.out.println("COULD NOT LOG!! :"+ e.getMessage());
 			    }
 		
 		}
-		
+		//Pushes the lines to file
+		// Dedicated method to make it easier to modify how individual lines are formatted
 		public void pushConfiguration(String line,  PrintWriter out)
 		{
 						    out.println(line+"\r\n");
-						    out.append("sup");
+						  
 		}
 		}
 		
