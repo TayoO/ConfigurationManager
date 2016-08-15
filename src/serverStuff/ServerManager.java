@@ -28,19 +28,24 @@ class ServerManager {
 	static String[] serverNames;
 	boolean[][] associations;
 
+	final BasicFrame frameManager = new BasicFrame();
+
 	static Scanner in = new Scanner(System.in);
 
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
-		ServerManager main = new ServerManager();
+		final ServerManager main = new ServerManager();
 		// main.loadDefault();
 		String[] chosenServers = null;
 		String[] changes;
-		main.introFrame();
-		main.configFrame();
-
+		
+		//main.ServerManagerFrame();
+		//main.configFrame();
+		main.ServerManagerFrame();
+System.out.println("hello");
 		System.out.println("powerscript path listed as" + main.powershell);
-		main.powershell = in.next();
+		
 		System.out.println("Do you want to push to groups?");
+		//main.powershell = in.next();
 		if (in.nextBoolean() == true) {
 
 			System.out.println("How many departments?");
@@ -190,8 +195,8 @@ class ServerManager {
 		out.println(line + "\r\n");
 
 	}
-
-	public void introFrame() {
+ 
+    public void ServerManagerFrame() {
 
 		// System.out.println("Do you want to push to groups?");
 		// if(in.nextBoolean()==true){
@@ -208,22 +213,48 @@ class ServerManager {
 		String[] types = new String[in.nextInt()];
 		for (int i = 0; i < types.length; i++) {
 
-			System.out.println("enter the  type names");
+			System.out.println("enter the type names");
 			types[i] = in.next();
 
 		}
 		final String[] chosenServers = this.getGroups(departs, types);
 
 		// }
+
+			System.out.println("Do you want to push to groups?");
+			//main.powershell = in.next();
+			GridBagConstraints introConstraints = new GridBagConstraints();
+			final JPanel introPan = new JPanel(new GridBagLayout());
+			final JTextArea powerShellInfoText = new JTextArea("powerscript path listed as" + this.powershell);
+
+			JButton introButton = new JButton("Servers");
+			introConstraints.gridx = 100;
+			introConstraints.gridy = 100;
+			introConstraints.insets = new Insets(40, 40, 40, 40);
+			introPan.add(introButton, introConstraints);
+
+			introConstraints.gridy = 40;
+			introPan.add(powerShellInfoText, introConstraints);
+
+			introButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String str = powerShellInfoText.getText();
+					powerShellInfoText.setText(" test");
+				}
+			});
+
+			
 		final ArrayList<String> changes = new ArrayList<String>();
 		final Boolean changesDone = false;
 		final String[] instruction = { "ExampleServer,ExampleSection,ExampleVariable,ExampleValue", "EnterDepartments",
 				"EnterTypes", "Enter individualServers" };
 		// final int counter=0;
-		final BasicFrame frame = new BasicFrame();
-		JPanel panel = new JPanel(new GridBagLayout());
+		
+		final JPanel pushPanel = new JPanel(new GridBagLayout());
 
-		frame.add(panel);
+		frameManager.add(pushPanel);
 
 		GridBagConstraints configConstraints = new GridBagConstraints();
 		final JPanel configPan = new JPanel(new GridBagLayout());
@@ -254,7 +285,7 @@ class ServerManager {
 		c.gridx = 30;
 		c.gridy = 0;
 		c.insets = new Insets(40, 40, 40, 40);
-		panel.add(push, c);
+		pushPanel.add(push, c);
 		JButton Done = new JButton("DonePushing");
 
 		c.gridy = 80;
@@ -271,42 +302,45 @@ class ServerManager {
 				}
 			}
 		});
-		frame.add(panel);
-		frame.getContentPane().add(panel, BorderLayout.WEST);
+		
+		frameManager.add(introPan);
+		frameManager.getContentPane().add(introPan, BorderLayout.WEST);
+		configButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frameManager.getContentPane().removeAll();
+				frameManager.add(pushPanel);
+				frameManager.revalidate();
+
+			}
+		});
+		
+		frameManager.getContentPane().add(pushPanel, BorderLayout.WEST);
 		push.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				frame.getContentPane().removeAll();
-				frame.getContentPane().add(configPan);
-				frame.revalidate();
+				frameManager.getContentPane().removeAll();
+				frameManager.getContentPane().add(configPan);
+				frameManager.revalidate();
 
 			}
 		});
 		JButton serv = new JButton("ManageServerList");
 		c.gridx = 40;
-		panel.add(serv, c);
+		pushPanel.add(serv, c);
 
 		// Use the setSize method that our BasicFrame
 		// object inherited to make the frame
 		// 200 pixels wide and high.
-		frame.setSize(500, 400);
+		frameManager.setSize(500, 400);
 
 		// Make the window show on the screen.
-		frame.setVisible(true);
+		frameManager.setVisible(true);
 	}
 
-	public void configFrame() {
-		BasicFrame frame = new BasicFrame();
-
-		// Use the setSize method that our BasicFrame
-		// object inherited to make the frame
-		// 200 pixels wide and high.
-		frame.setSize(500, 400);
-
-		// Make the window show on the screen.
-		frame.setVisible(true);
-	}
+	
 
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
