@@ -16,6 +16,7 @@ import java.util.Scanner;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComboBoxes;
 
 import javax.swing.*;
 
@@ -34,6 +35,13 @@ class ServerManager {
 
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		final ServerManager main = new ServerManager();
+		String [] departmentList={"VAC","SSC","RCMP","PWGSC"};
+		String [] serverList={"AD","AG","FE","ID"};
+		DropDownList chooseDep=new DropDownList(departmentList);
+		chooseDep.run( 200, 125);
+		DropDownList chooseServ=new DropDownList(serverList);
+		chooseServ.run( 200, 125);
+		 
 		// main.loadDefault();
 		String[] chosenServers = null;
 		String[] changes;
@@ -254,7 +262,7 @@ System.out.println("hello");
 		
 		final JPanel pushPanel = new JPanel(new GridBagLayout());
 
-		frameManager.add(pushPanel);
+		
 
 		GridBagConstraints configConstraints = new GridBagConstraints();
 		final JPanel configPan = new JPanel(new GridBagLayout());
@@ -302,7 +310,16 @@ System.out.println("hello");
 				}
 			}
 		});
-		
+		introButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frameManager.getContentPane().removeAll();
+				frameManager.add(configPan);
+				frameManager.revalidate();
+
+			}
+		});
 		frameManager.add(introPan);
 		frameManager.getContentPane().add(introPan, BorderLayout.WEST);
 		configButton.addActionListener(new ActionListener() {
@@ -331,13 +348,6 @@ System.out.println("hello");
 		c.gridx = 40;
 		pushPanel.add(serv, c);
 
-		// Use the setSize method that our BasicFrame
-		// object inherited to make the frame
-		// 200 pixels wide and high.
-		frameManager.setSize(500, 400);
-
-		// Make the window show on the screen.
-		frameManager.setVisible(true);
 	}
 
 	
