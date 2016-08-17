@@ -37,8 +37,31 @@ class ServerManager {
 		final ServerManager main = new ServerManager();
 		String [] departmentList={"VAC","SSC","RCMP","PWGSC"};
 		String [] serverList={"AD","AG","FE","ID"};
-		DropDownList chooseDep=new DropDownList(departmentList);
-		chooseDep.run( 200, 125);
+		DropDownListThread chooseDep=new DropDownListThread(departmentList);
+		
+		synchronized(chooseDep){
+            try{
+            	
+                System.out.println("Waiting for departments to be choosen...");
+                chooseDep.run( 200, 125);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+ if (chooseDep.results.length==0){
+	 System.out.println("no departments chosen");
+ }
+ else if (chooseDep.results.length==1){
+	 System.out.println("The department is "+chooseDep.results[0]);
+ }
+ else{
+	 System.out.println("The departments are:");
+	 for (int i=0;i<chooseDep.results.length; i++)
+	 {
+		 System.out.println(chooseDep.results[i]);
+	 }
+ }
+           
+        }
 		DropDownList chooseServ=new DropDownList(serverList);
 		chooseServ.run( 200, 125);
 		 

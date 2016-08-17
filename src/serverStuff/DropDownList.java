@@ -24,13 +24,15 @@ private JComboBox c = new JComboBox();
 
 private JButton b = new JButton("Add items");
 
-private LinkedList<Integer> results;
+LinkedList<String> results=new LinkedList();
+public boolean done=false;
 
 private int count = 0;
 public DropDownList(String [] options)
 {
 	description=options;
 }
+
 public void init() {
  for (int i = 0; i < 4; i++)
    c.addItem(description[count++]);
@@ -38,14 +40,24 @@ public void init() {
  b.addActionListener(new ActionListener() {
    public void actionPerformed(ActionEvent e) {
      if (count < description.length)
+     {
        c.addItem(description[count++]);
+     results.push((String) c.getSelectedItem());
+     }
+     //System.out.println(results.toArray()[0]);
+     System.out.println("done");
+   done=true;
    }
+
+
  });
  c.addActionListener(new ActionListener() {
    public void actionPerformed(ActionEvent e) {
-	   results.push(c.getSelectedIndex());
-     t.setText("index: " + c.getSelectedIndex() + "   "
+	   System.out.println((String) c.getSelectedItem());
+	   
+     t.setText("index: " + (int)c.getSelectedIndex() + "   "
          + ((JComboBox) e.getSource()).getSelectedItem());
+     b.setText("Done Selection");
    }
  });
  Container cp = getContentPane();
