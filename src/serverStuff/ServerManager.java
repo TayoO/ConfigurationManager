@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Scanner;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComboBoxes;
 
 import javax.swing.*;
+
+
 
 class ServerManager {
 	static String path = "c:/temp/opentext.ini";
@@ -209,10 +212,8 @@ class ServerManager {
 		
 		
 
-			
-			
-			List temp = (List) Arrays.asList(this.getGroups(departs, types));
-			chosenServers.addAll((Collection<? extends String>) temp);
+		Collections.addAll(chosenServers, this.getGroups(departs, types));
+
 		}
 		
 		GridBagConstraints servConstraints = new GridBagConstraints();
@@ -237,7 +238,7 @@ frameManager.add(servPan);
 				chosenServers.add(str);
 			}
 		});
-		String [] temp = null;
+		String [] temp = {"wgwer","wfe"};
 		return chosenServers.toArray(temp);
 	}
 	// Combines the server info with changes than passes it on to push line by
