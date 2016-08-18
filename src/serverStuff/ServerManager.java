@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -28,6 +30,7 @@ class ServerManager {
 	Server[] serverList;
 	static String[] serverNames;
 	boolean[][] associations;
+	
 
 	final BasicFrame frameManager = new BasicFrame();
 
@@ -35,72 +38,11 @@ class ServerManager {
 
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		final ServerManager main = new ServerManager();
-		String [] departmentList={"VAC","SSC","RCMP","PWGSC"};
-		String [] serverList={"AD","AG","FE","ID"};
-		DropDownListThread chooseDep=new DropDownListThread(departmentList);
-		
-		synchronized(chooseDep){
-            try{
-            	
-                System.out.println("Waiting for departments to be choosen...");
-                chooseDep.run( 200, 125);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
- if (chooseDep.results.length==0){
-	 System.out.println("no departments chosen");
- }
- else if (chooseDep.results.length==1){
-	 System.out.println("The department is "+chooseDep.results[0]);
- }
- else{
-	 System.out.println("The departments are:");
-	 for (int i=0;i<chooseDep.results.length; i++)
-	 {
-		 System.out.println(chooseDep.results[i]);
-	 }
- }
-           
-        }
-		DropDownList chooseServ=new DropDownList(serverList);
-		chooseServ.run( 200, 125);
-		 
-		// main.loadDefault();
-		String[] chosenServers = null;
-		String[] changes;
-		
-		//main.ServerManagerFrame();
-		//main.configFrame();
+		String[] chosenServers = main.chooseServer();
 		main.ServerManagerFrame();
-System.out.println("hello");
-		System.out.println("powerscript path listed as" + main.powershell);
-		
-		System.out.println("Do you want to push to groups?");
-		//main.powershell = in.next();
-		if (in.nextBoolean() == true) {
-
-			System.out.println("How many departments?");
-			String[] departs = new String[in.nextInt()];
-
-			for (int i = 0; i < departs.length; i++) {
-
-				System.out.println("enter the next department name");
-				departs[i] = in.next();
-			}
-			System.out.println("how many server types?");
-			String[] types = new String[in.nextInt()];
-			for (int i = 0; i < types.length; i++) {
-
-				System.out.println("enter the  type names");
-				types[i] = in.next();
-
-			}
-			chosenServers = main.getGroups(departs, types);
-
-		}
-
+/*
 		// System.out.println("What server names do you want to push to");
-
+		String[] changes;
 		System.out.println("how many changes do you want to push");
 		changes = new String[in.nextInt()];
 		in.nextLine();
@@ -136,7 +78,9 @@ System.out.println("hello");
 	}
 
 	//
-
+	 * */
+	
+}
 	/*
 	 * file code: numGroups numServers listOfGroupNames seperated by commas
 	 * ListOfServerNames seperated by commas numGroups lines each with list of
@@ -191,8 +135,114 @@ System.out.println("hello");
 		return (String[]) names.toArray(exampleArray);
 	}
 
+	
+	
+	public String [] chooseServer(){
+		final ArrayList<String> chosenServers = new ArrayList<String>();
+		System.out.println("Do you want to push to groups?");
+		//main.powershell = in.next();
+		if (in.nextBoolean() == true) {
+			String [] departs;
+			String [] types;
+		String [] departmentList={"VAC","SSC","RCMP","PWGSC"};
+		String [] typeList={"AD","AG","FE","ID"};
+		DropDownListThread chooseDep=new DropDownListThread(departmentList);
+		
+		synchronized(chooseDep){
+            try{
+            	
+                System.out.println("Waiting for departments to be choosen...");
+                chooseDep.run( 200, 125);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            departs=chooseDep.results;
+ if (departs.length==0){
+	 System.out.println("no departments chosen");
+ }
+ else if (departs.length==1){
+	 System.out.println("The department is "+departs[0]);
+ }
+ else{
+	 System.out.println("The departments are:");
+	 for (int i=0;i<departs.length; i++)
+	 {
+		 System.out.println(departs[i]);
+	 }
+ }
+           
+        }
+		// Copy pasted code from previous lines.
+		DropDownListThread chooseType=new DropDownListThread(typeList);
+		 
+		
+		synchronized(chooseType){
+            try{
+            	
+                System.out.println("Waiting for types to be choosen...");
+                chooseType.run( 200, 125);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            types=chooseType.results;
+ if (types.length==0){
+	 System.out.println("no types chosen");
+ }
+ else if (types.length==1){
+	 System.out.println("The type is "+types[0]);
+ }
+ else{
+	 System.out.println("The types are:");
+	 for (int i=0;i<types.length; i++)
+	 {
+		 System.out.println(types[i]);
+	 }
+ }
+		}
+		// main.loadDefault();
+
+
+		
+		//main.ServerManagerFrame();
+		//main.configFrame();
+		System.out.println("powerscript path listed as" + this.powershell);
+		
+		
+
+			
+			
+			List temp = (List) Arrays.asList(this.getGroups(departs, types));
+			chosenServers.addAll((Collection<? extends String>) temp);
+		}
+		
+		GridBagConstraints servConstraints = new GridBagConstraints();
+		final JPanel servPan = new JPanel(new GridBagLayout());
+		final JTextArea editTextArea = new JTextArea("Enter servername here");
+
+		JButton servButton = new JButton("Done");
+		servConstraints.gridx = 100;
+		servConstraints.gridy = 100;
+		servConstraints.insets = new Insets(40, 40, 40, 40);
+		servPan.add(servButton, servConstraints);
+
+		servConstraints.gridy = 40;
+		servPan.add(editTextArea, servConstraints);
+frameManager.add(servPan);
+		servButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String str = editTextArea.getText();
+				editTextArea.setText(" ");
+				chosenServers.add(str);
+			}
+		});
+		String [] temp = null;
+		return chosenServers.toArray(temp);
+	}
 	// Combines the server info with changes than passes it on to push line by
 	// line
+	
 	public void pushConfiguration(String[] servers, String[] change) throws IOException {
 		File log = new File("U:\\test\\changes2.csv");
 		try {
@@ -229,31 +279,6 @@ System.out.println("hello");
  
     public void ServerManagerFrame() {
 
-		// System.out.println("Do you want to push to groups?");
-		// if(in.nextBoolean()==true){
-
-		System.out.println("How many departments?");
-		String[] departs = new String[in.nextInt()];
-
-		for (int i = 0; i < departs.length; i++) {
-
-			System.out.println("enter the next department name");
-			departs[i] = in.next();
-		}
-		System.out.println("how many server types?");
-		String[] types = new String[in.nextInt()];
-		for (int i = 0; i < types.length; i++) {
-
-			System.out.println("enter the type names");
-			types[i] = in.next();
-
-		}
-		final String[] chosenServers = this.getGroups(departs, types);
-
-		// }
-
-			System.out.println("Do you want to push to groups?");
-			//main.powershell = in.next();
 			GridBagConstraints introConstraints = new GridBagConstraints();
 			final JPanel introPan = new JPanel(new GridBagLayout());
 			final JTextArea powerShellInfoText = new JTextArea("powerscript path listed as" + this.powershell);
@@ -326,7 +351,7 @@ System.out.println("hello");
 			public void actionPerformed(ActionEvent e) {
 				String[] test = new String[0];
 				try {
-					pushConfiguration(chosenServers, changes.toArray(test));
+					pushConfiguration(chooseServer(), changes.toArray(test));
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

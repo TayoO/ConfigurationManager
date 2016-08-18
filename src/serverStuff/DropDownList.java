@@ -25,6 +25,7 @@ private JComboBox c = new JComboBox();
 private JButton b = new JButton("Add items");
 
 LinkedList<String> results=new LinkedList();
+
 public boolean done=false;
 
 private int count = 0;
@@ -38,11 +39,14 @@ public void init() {
    c.addItem(description[count++]);
  t.setEditable(false);
  b.addActionListener(new ActionListener() {
+	 
    public void actionPerformed(ActionEvent e) {
+    
+     
      if (count < description.length)
-     {
-       c.addItem(description[count++]);
-     results.push((String) c.getSelectedItem());
+    
+        {c.addItem(description[count++]);
+
      }
      //System.out.println(results.toArray()[0]);
      System.out.println("done");
@@ -53,8 +57,8 @@ public void init() {
  });
  c.addActionListener(new ActionListener() {
    public void actionPerformed(ActionEvent e) {
-	   System.out.println((String) c.getSelectedItem());
-	   
+	   System.out.println("push: "+c.getSelectedItem());
+	   results.push((String) c.getSelectedItem());
      t.setText("index: " + (int)c.getSelectedIndex() + "   "
          + ((JComboBox) e.getSource()).getSelectedItem());
      b.setText("Done Selection");
