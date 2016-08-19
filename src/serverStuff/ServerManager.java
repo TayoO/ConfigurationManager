@@ -279,7 +279,6 @@ frameManager.add(servPan);
 	}
  
     public void ServerManagerFrame() {
-
 			GridBagConstraints introConstraints = new GridBagConstraints();
 			final JPanel introPan = new JPanel(new GridBagLayout());
 			final JTextArea powerShellInfoText = new JTextArea("powerscript path listed as" + this.powershell);
@@ -369,8 +368,26 @@ frameManager.add(servPan);
 
 			}
 		});
+
+		//2. Optional: What happens when the frame closes?
+		frameManager.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		//3. Create components and put them in the frame.
+		//...create emptyLabel...
+		frameManager.getContentPane().removeAll();
+		frameManager.getContentPane().add( BorderLayout.CENTER, Done);
+
+		
+		
+		System.out.println("adding introPan!");
+		
 		frameManager.add(introPan);
 		frameManager.getContentPane().add(introPan, BorderLayout.WEST);
+		frameManager.revalidate();
+				frameManager.pack();
+				frameManager.setVisible(true);
+				
+		System.out.println("introPan added!");
 		configButton.addActionListener(new ActionListener() {
 
 			@Override
