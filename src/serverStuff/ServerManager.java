@@ -33,56 +33,17 @@ class ServerManager {
 	Server[] serverList;
 	static String[] serverNames;
 	boolean[][] associations;
-	
-
+	GridBagConstraints globalConstraints = new GridBagConstraints();
+//Outside of droplist applets all graphics go on this one frame.
 	final BasicFrame frameManager = new BasicFrame();
 
-	static Scanner in = new Scanner(System.in);
+	//static Scanner in = new Scanner(System.in);
 
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		final ServerManager main = new ServerManager();
+		
 		String[] chosenServers = main.chooseServer();
-		main.ServerManagerFrame();
-/*
-		// System.out.println("What server names do you want to push to");
-		String[] changes;
-		System.out.println("how many changes do you want to push");
-		changes = new String[in.nextInt()];
-		in.nextLine();
-		String section;
-		String variable;
-		String value;
-		// System.out.close();
-		System.out.println("What is the path for the inichange file?");
-		path = in.nextLine();
-		for (int i = 0; i < changes.length; i++) {
-			System.out.println("Input info:");
-
-			Thread.sleep(3000);
-			System.out.println("Which section?");
-			section = in.nextLine();
-			System.out.println("Which variable?");
-			variable = in.nextLine();
-			System.out.println("What value are you setting it too?");
-			value = in.nextLine();
-			changes[i] = section + "," + variable + "," + value + "," + path;
-		}
-		main.pushConfiguration(chosenServers, changes);
-
-		// This triggers the powershell script so it can implement the changes
-		// made in the file
-		Runtime runtime = Runtime.getRuntime();
-		Process proc = (Process) runtime.exec(main.powershell);
-		// Prints out the powershell output
-		BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-		System.out.println("Powershell:");
-		System.out.println(br.readLine());
-		proc.getOutputStream().close();
-	}
-
-	//
-	 * */
-	
+		main.openFrame();
 }
 	/*
 	 * file code: numGroups numServers listOfGroupNames seperated by commas
@@ -91,7 +52,65 @@ class ServerManager {
 	 * Example] 5 6 frontEnd, BackEnd, PWGSC, SSC, RCMP PWFE, PWBE, SSCFE,
 	 * SSCBE, RCMPFE, RCMPBE 1,3,5 2,4,6 1,2h 5,6
 	 */
-	public String[] getGroups(String[] departs, String[] type) {
+	public void openFrame(){
+		
+		//Constraints
+		globalConstraints.gridx = 100;
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
+		globalConstraints.gridy = 40;
+		
+		
+		final JPanel introPan = new JPanel(new GridBagLayout());
+		final JTextArea title = new JTextArea("Content Server Configuration Manager");
+		
+		JButton config = new JButton("Push configurations");
+		JButton serv  = new JButton("Manage ServerList");
+		globalConstraints.gridx = 40;
+		introPan.add(serv, globalConstraints);
+		globalConstraints.gridx = 100;
+        introPan.add(config, globalConstraints);
+
+		//globalConstraints.gridy = 70;
+		//final JTextArea powerShellInfoText = new JTextArea("powerscript path listed as" + this.powershell);JButton serv = new JButton("Manage ServerList");
+		//introPan.add(powerShellInfoText, globalConstraints);
+		globalConstraints.gridy = 20;
+		globalConstraints.gridx = 40;
+		introPan.add(title, globalConstraints);
+/*
+		introButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String str = powerShellInfoText.getText();
+				powerShellInfoText.setText(" test");
+			}
+		});
+		*/
+		config.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frameManager.getContentPane().removeAll();
+				
+				configurations();
+			}
+		});
+		serv.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frameManager.getContentPane().removeAll();
+				serverListManagement();
+			}
+		});
+		System.out.println("hey");
+		frameManager.add(introPan);
+		frameManager.revalidate();
+		frameManager.pack();
+		frameManager.setVisible(true);
+		System.out.println("hey");
+	}
+	public String[] SQLGroups(String[] departs, String[] type) {
 		// Variables for sql connection
 		Connection c = null;
 		Statement stmt = null;
@@ -138,13 +157,8 @@ class ServerManager {
 		return (String[]) names.toArray(exampleArray);
 	}
 
-	
-	
-	public String [] chooseServer(){
-		final ArrayList<String> chosenServers = new ArrayList<String>();
-		System.out.println("Do you want to push to groups?");
-		//main.powershell = in.next();
-		if (in.nextBoolean() == true) {
+	public String [] getGroups(){
+		{
 			String [] departs;
 			String [] types;
 		String [] departmentList={"VAC","SSC","RCMP","PWGSC"};
@@ -212,22 +226,43 @@ class ServerManager {
 		
 		
 
-		Collections.addAll(chosenServers, this.getGroups(departs, types));
+
 
 		}
+		return null;
 		
-		GridBagConstraints servConstraints = new GridBagConstraints();
+	}
+// Choosing which server to push configuration to	
+	public String [] chooseServer(){
+		 final JPanel choosePan = new JPanel(new GridBagLayout());
+		final ArrayList<String> chosenServers = new ArrayList<String>();
+		
+
+		JButton groups = new JButton("Do you want to push to groups?");
+		globalConstraints.gridx=40;
+		globalConstraints.gridy=40;
+		
+		groups.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Collections.addAll(chosenServers,getGroups());
+			}
+		});
+		choosePan.add(groups,globalConstraints);
+			
+		
 		final JPanel servPan = new JPanel(new GridBagLayout());
 		final JTextArea editTextArea = new JTextArea("Enter servername here");
 
 		JButton servButton = new JButton("Done");
-		servConstraints.gridx = 100;
-		servConstraints.gridy = 100;
-		servConstraints.insets = new Insets(40, 40, 40, 40);
-		servPan.add(servButton, servConstraints);
+		globalConstraints.gridx = 100;
+		globalConstraints.gridy = 100;
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
+		servPan.add(servButton, globalConstraints);
 
-		servConstraints.gridy = 40;
-		servPan.add(editTextArea, servConstraints);
+		globalConstraints.gridy = 40;
+		servPan.add(editTextArea, globalConstraints);
 frameManager.add(servPan);
 		servButton.addActionListener(new ActionListener() {
 
@@ -238,7 +273,7 @@ frameManager.add(servPan);
 				chosenServers.add(str);
 			}
 		});
-		String [] temp = {"wgwer","wfe"};
+		String [] temp = {};
 		return chosenServers.toArray(temp);
 	}
 	// Combines the server info with changes than passes it on to push line by
@@ -278,29 +313,43 @@ frameManager.add(servPan);
 
 	}
  
-    public void ServerManagerFrame() {
-			GridBagConstraints introConstraints = new GridBagConstraints();
-			final JPanel introPan = new JPanel(new GridBagLayout());
-			final JTextArea powerShellInfoText = new JTextArea("powerscript path listed as" + this.powershell);
+	public void serverListManagement(){
+		final JPanel listPan = new JPanel(new GridBagLayout());
+		FlowLayout experimentLayout = new FlowLayout();
+		listPan.setLayout(experimentLayout);
+		JButton addingGroups = new JButton("Add Groups");
+		JButton modifyGroups = new JButton("Modify Groups");
+		JButton deleteGroups = new JButton("Delete Groups");
+		globalConstraints.gridx = 100;
+		globalConstraints.gridy = 100;
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
+		JButton addingServers = new JButton("Add Servers");
+		JButton modifyServers = new JButton("Modify Servers");
+		JButton deleteServers = new JButton("Delete Servers");
+listPan.add(addingGroups, globalConstraints);
+globalConstraints.gridx = 100;
+listPan.add(modifyGroups, globalConstraints);
+globalConstraints.gridx = 100;
+listPan.add(deleteGroups, globalConstraints);
+listPan.add(addingServers, globalConstraints);
+listPan.add(modifyServers, globalConstraints);
+listPan.add(deleteServers, globalConstraints);
+		frameManager.add(listPan);
+		frameManager.getContentPane().add(listPan, BorderLayout.WEST);
+		frameManager.revalidate();
+				frameManager.pack();
+				frameManager.setVisible(true);
+				
 
-			JButton introButton = new JButton("Servers");
-			introConstraints.gridx = 100;
-			introConstraints.gridy = 100;
-			introConstraints.insets = new Insets(40, 40, 40, 40);
-			introPan.add(introButton, introConstraints);
 
-			introConstraints.gridy = 40;
-			introPan.add(powerShellInfoText, introConstraints);
-
-			introButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String str = powerShellInfoText.getText();
-					powerShellInfoText.setText(" test");
-				}
-			});
-
+	}
+	
+	
+	
+	
+    public void configurations() {
+			
+    	
 			
 		final ArrayList<String> changes = new ArrayList<String>();
 		final Boolean changesDone = false;
@@ -312,18 +361,17 @@ frameManager.add(servPan);
 
 		
 
-		GridBagConstraints configConstraints = new GridBagConstraints();
 		final JPanel configPan = new JPanel(new GridBagLayout());
 		final JTextArea editTextArea = new JTextArea("ExampleServer,ExampleSection,ExampleVariable,ExampleValue");
 
 		JButton configButton = new JButton("PushConfiguration");
-		configConstraints.gridx = 100;
-		configConstraints.gridy = 100;
-		configConstraints.insets = new Insets(40, 40, 40, 40);
-		configPan.add(configButton, configConstraints);
+		globalConstraints.gridx = 100;
+		globalConstraints.gridy = 100;
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
+		configPan.add(configButton, globalConstraints);
 
-		configConstraints.gridy = 40;
-		configPan.add(editTextArea, configConstraints);
+		globalConstraints.gridy = 40;
+		configPan.add(editTextArea, globalConstraints);
 
 		configButton.addActionListener(new ActionListener() {
 
@@ -335,17 +383,15 @@ frameManager.add(servPan);
 			}
 		});
 
-		GridBagConstraints c = new GridBagConstraints();
-
 		JButton push = new JButton("PushConfiguration");
-		c.gridx = 30;
-		c.gridy = 0;
-		c.insets = new Insets(40, 40, 40, 40);
-		pushPanel.add(push, c);
+		globalConstraints.gridx = 30;
+		globalConstraints.gridy = 0;
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
+		pushPanel.add(push, globalConstraints);
 		JButton Done = new JButton("DonePushing");
 
-		c.gridy = 80;
-		configPan.add(Done, c);
+		globalConstraints.gridy = 80;
+		configPan.add(Done, globalConstraints);
 		Done.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -358,16 +404,7 @@ frameManager.add(servPan);
 				}
 			}
 		});
-		introButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				frameManager.getContentPane().removeAll();
-				frameManager.add(configPan);
-				frameManager.revalidate();
-
-			}
-		});
+	
 
 		//2. Optional: What happens when the frame closes?
 		frameManager.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -379,15 +416,7 @@ frameManager.add(servPan);
 
 		
 		
-		System.out.println("adding introPan!");
-		
-		frameManager.add(introPan);
-		frameManager.getContentPane().add(introPan, BorderLayout.WEST);
-		frameManager.revalidate();
-				frameManager.pack();
-				frameManager.setVisible(true);
-				
-		System.out.println("introPan added!");
+
 		configButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -410,16 +439,11 @@ frameManager.add(servPan);
 
 			}
 		});
-		JButton serv = new JButton("ManageServerList");
-		c.gridx = 40;
-		pushPanel.add(serv, c);
 
+		frameManager.revalidate();
 	}
 
 	
 
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 
-	}
 }
