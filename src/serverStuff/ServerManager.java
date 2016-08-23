@@ -377,7 +377,7 @@ frameManager.setVisible(true);
 		final JComponent [] comp= new JComponent[sects.length];
 		for (int i=0; i<sects.length; i++){
 	
-			if (sects[i].charAt(0)=='t'){
+			if (i%2==1){
 				// Only used since final variables must be used for action performed.
 				final int x=i;
 				comp[i] = new JTextField(sects[i].substring(1,sects.length));
@@ -387,7 +387,7 @@ frameManager.setVisible(true);
 					}
 				});
 			}
-			if (sects[i].charAt(0)=='l'){
+			else{
 				comp[i] = new JLabel(sects[i].substring(1,sects[i].length()));
 			}
 			autoPan.add(comp[i]);
