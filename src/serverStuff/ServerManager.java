@@ -1,10 +1,8 @@
 package serverStuff;
 
-import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,15 +10,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Scanner;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComboBoxes;
-
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
@@ -104,6 +97,7 @@ class ServerManager {
 			}
 		});
 		System.out.println("hey");
+		frameManager.getContentPane().removeAll();
 		frameManager.add(introPan);
 		System.out.println("intro pan");
 		frameManager.revalidate();
@@ -158,7 +152,7 @@ class ServerManager {
 		return (String[]) names.toArray(exampleArray);
 	}
 
-	public void addServer(String id, String number, String type, String dep, String cif, String ip) throws ClassNotFoundException, SQLException{
+	public void addServerSQL(String id, String number, String type, String dep, String cif, String ip) throws ClassNotFoundException, SQLException{
 
 	    
 	    Connection c = null;
@@ -176,7 +170,7 @@ class ServerManager {
 			System.exit(0);
 		}
 	}
-public void modifyServer(int [] id, String columnName, String change) {
+public void modifyServerSQL(int id, String columnName, String change) {
 
 	    
 	    Connection c = null;
@@ -193,7 +187,7 @@ public void modifyServer(int [] id, String columnName, String change) {
 			System.exit(0);
 		}
 	}
-public void deleteServer(int id){
+public void deleteServerSQL(int id){
 	  Connection c = null;
 			Statement stmt = null;
 			
@@ -211,6 +205,7 @@ public void deleteServer(int id){
 }
 	public String [] getGroups(){
 		{
+			System.out.println("get groups");
 			String [] departs;
 			String [] types;
 		String [] departmentList={"VAC","SSC","RCMP","PWGSC"};
@@ -290,20 +285,39 @@ public void deleteServer(int id){
 		final ArrayList<String> chosenServers = new ArrayList<String>();
 		
 
-		JButton groups = new JButton("Do you want to push to groups?");
+		JButton toGroups = new JButton("Push to Groups");
 		globalConstraints.gridx=40;
 		globalConstraints.gridy=40;
-		
-		groups.addActionListener(new ActionListener() {
+		JButton toServ   = new JButton("Push to individual Servers");
+		toGroups.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Collections.addAll(chosenServers,getGroups());
 			}
 		});
-		choosePan.add(groups,globalConstraints);
+		toServ.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Collections.addAll(chosenServers,getServs());
+			}
+		});
+		choosePan.add(toGroups,globalConstraints);
+		globalConstraints.gridx=80;
+		choosePan.add(toServ,globalConstraints);
 			
 		
+
+		
+		String [] temp = {};
+		return chosenServers.toArray(temp);
+	}
+	// Combines the server info with changes than passes it on to push line by
+	// line
+	
+	protected String [] getServs() {
+		final String[] serv=new String [1];
 		final JPanel servPan = new JPanel(new GridBagLayout());
 		final JTextArea editTextArea = new JTextArea("Enter servername here");
 
@@ -315,27 +329,23 @@ public void deleteServer(int id){
 
 		globalConstraints.gridy = 40;
 		servPan.add(editTextArea, globalConstraints);
+		frameManager.getContentPane().removeAll();
 frameManager.add(servPan);
 System.out.println("serv pan");
 frameManager.revalidate();
 frameManager.pack();
 frameManager.setVisible(true);
-
 		servButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String str = editTextArea.getText();
+				serv [0]= editTextArea.getText();
 				editTextArea.setText(" ");
-				chosenServers.add(str);
+				
 			}
 		});
-		String [] temp = {};
-		return chosenServers.toArray(temp);
+		return null;
 	}
-	// Combines the server info with changes than passes it on to push line by
-	// line
-	
 	public void pushConfiguration(String[] servers, String[] change) throws IOException {
 		File log = new File("U:\\test\\changes2.csv");
 		try {
@@ -370,6 +380,8 @@ frameManager.setVisible(true);
 
 	}
  public String []  autoPanel(final JPanel nextPan, String ... sects){
+	 final boolean [] finished= new boolean [1];
+	 finished[0]=false;
 	 String [] output=new String [sects.length];
 	 final JPanel autoPan= new JPanel(new GridBagLayout());
 	 FlowLayout experimentLayout = new FlowLayout();
@@ -381,7 +393,7 @@ frameManager.setVisible(true);
 				// Only used since final variables must be used for action performed.
 				final int x=i;
 				comp[i] = new JTextField(sects[i].substring(1,sects.length));
-			((AbstractButton) comp[i]).addActionListener(new ActionListener(){
+			( (JTextField) comp[i]).addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent e){
                             ((JTextComponent) comp[x]).getText();
 					}
@@ -396,7 +408,9 @@ frameManager.setVisible(true);
 	 JButton done = new JButton("Done");
 	 done.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
+				frameManager.getContentPane().removeAll();
 				frameManager.add(nextPan);
+				finished[1]=true;
 				System.out.println("next pan");
 				frameManager.getContentPane().add(nextPan, BorderLayout.WEST);
 				frameManager.revalidate();
@@ -404,12 +418,18 @@ frameManager.setVisible(true);
 						frameManager.setVisible(true);
 			}
 		});
+	 autoPan.add(done);
+	 frameManager.getContentPane().removeAll();
 		frameManager.add(autoPan);
 		System.out.println("auto pan");
 		frameManager.getContentPane().add(autoPan, BorderLayout.WEST);
 		frameManager.revalidate();
 				frameManager.pack();
 				frameManager.setVisible(true);
+				while(!finished[0])
+				{
+					
+				}
 	return output;	
  }
  
@@ -433,7 +453,7 @@ listPan.add(deleteGroups, globalConstraints);
 listPan.add(addingServers, globalConstraints);
 listPan.add(modifyServers, globalConstraints);
 listPan.add(deleteServers, globalConstraints);
-		frameManager.add(listPan);
+frameManager.getContentPane().removeAll();
 		System.out.println("list pan");
 		frameManager.getContentPane().add(listPan, BorderLayout.WEST);
 		frameManager.revalidate();
@@ -443,16 +463,6 @@ listPan.add(deleteServers, globalConstraints);
 
 	addingGroups.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
-			String [] results=autoPanel(introPan, "lid:","tEnter id here, must be a number","lnumber","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC",
-					
-					"lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342");
-try {
-	System.out.println("adding Serv");
-	addServer(results[1],results[3],results[5],results[7],results[9],results[11]);
-} catch (ClassNotFoundException | SQLException e1) {
-	// TODO Auto-generated catch block
-	e1.printStackTrace();
-}
 		}
 	})	;		
 
@@ -475,7 +485,11 @@ deleteGroups.addActionListener(new ActionListener(){
 
 addingServers.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e){
-		//JLabel id = new JLabel("id:");
+		String [] results=autoPanel(introPan, "lid:","tEnter id here, must be a number","lnumber","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC",
+			
+				"lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342");
+		System.out.println(results[0]+results[1]+results[2]+results[3]+results[4]+results[5]+results[6]+results[7]);	
+System.out.println("adding Serv");
 
 
 	}
@@ -504,23 +518,21 @@ deleteServers.addActionListener(new ActionListener(){
 	
 	
     public void configurations() {
-			
-    	
+	
 			
 		final ArrayList<String> changes = new ArrayList<String>();
-		final Boolean changesDone = false;
-		final String[] instruction = { "ExampleServer,ExampleSection,ExampleVariable,ExampleValue", "EnterDepartments",
-				"EnterTypes", "Enter individualServers" };
+		
 		// final int counter=0;
 		
-		final JPanel pushPanel = new JPanel(new GridBagLayout());
+
 
 		
 
 		final JPanel configPan = new JPanel(new GridBagLayout());
 		final JTextArea editTextArea = new JTextArea("ExampleServer,ExampleSection,ExampleVariable,ExampleValue");
 
-		JButton configButton = new JButton("PushConfiguration");
+		JButton configButton = new JButton("New Configuration");
+		
 		globalConstraints.gridx = 100;
 		globalConstraints.gridy = 100;
 		globalConstraints.insets = new Insets(40, 40, 40, 40);
@@ -538,12 +550,22 @@ deleteServers.addActionListener(new ActionListener(){
 				changes.add(str);
 			}
 		});
+		JButton back= new JButton("Back");
+		back.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openFrame();
+			}
+		});
+		globalConstraints.gridx = 60;
+		globalConstraints.gridy = 100;
+		configPan.add(back, globalConstraints);
 		JButton push = new JButton("PushConfiguration");
 		globalConstraints.gridx = 60;
 		globalConstraints.gridy = 60;
 		globalConstraints.insets = new Insets(40, 40, 40, 40);
-		pushPanel.add(push, globalConstraints);
+		configPan.add(push, globalConstraints);
 		JButton Done = new JButton("DonePushing");
 
 		globalConstraints.gridy = 80;
@@ -553,6 +575,7 @@ deleteServers.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				String[] test = new String[0];
 				try {
+					System.out.println("pushing changes"+changes.toArray(test)[0]);
 					pushConfiguration(chooseServer(), changes.toArray(test));
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -568,7 +591,7 @@ deleteServers.addActionListener(new ActionListener(){
 		//3. Create components and put them in the frame.
 		//...create emptyLabel...
 		frameManager.getContentPane().removeAll();
-		frameManager.getContentPane().add( BorderLayout.CENTER, Done);
+		//frameManager.getContentPane().add( BorderLayout.CENTER, Done);
 
 		
 		
@@ -577,25 +600,19 @@ deleteServers.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				frameManager.getContentPane().removeAll();
-				frameManager.add(pushPanel);
-				System.out.println("pushPanel");
-				frameManager.getContentPane().add(pushPanel, BorderLayout.WEST);
-				frameManager.revalidate();
-						frameManager.pack();
-						frameManager.setVisible(true);
-
+				
+				editTextArea.setText("ExampleServer,ExampleSection,ExampleVariable,ExampleValue");
 			}
 		});
 		
-		frameManager.getContentPane().add(pushPanel, BorderLayout.WEST);
+		frameManager.add(configPan);
 		push.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				frameManager.getContentPane().removeAll();
-				frameManager.getContentPane().add(configPan);
-				frameManager.revalidate();
+				(changes).add(editTextArea.getText());
+				editTextArea.setText("ExampleServer,ExampleSection,ExampleVariable,ExampleValue");
+
 
 			}
 		});
