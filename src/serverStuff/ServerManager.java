@@ -530,17 +530,31 @@ deleteServers.addActionListener(new ActionListener(){
 
 		final JPanel configPan = new JPanel(new GridBagLayout());
 		final JTextArea editTextArea = new JTextArea("ExampleServer,ExampleSection,ExampleVariable,ExampleValue");
-
 		JButton configButton = new JButton("New Configuration");
+		JButton back= new JButton("Back");
+		JButton push = new JButton("PushConfiguration");
 		
 		globalConstraints.gridx = 100;
 		globalConstraints.gridy = 100;
 		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		configPan.add(configButton, globalConstraints);
-
+		JButton Done = new JButton("DonePushing");
+		
+		
+		globalConstraints.gridx = 80;
+		
+		configPan.add(back, globalConstraints);
+		globalConstraints.gridx = 60;
+		globalConstraints.gridy = 60;
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
+		configPan.add(push, globalConstraints);
+		
+		
+		configPan.add(back, globalConstraints);
+		globalConstraints.gridy = 80;
+		configPan.add(Done, globalConstraints);
 		globalConstraints.gridy = 40;
 		configPan.add(editTextArea, globalConstraints);
-
 		configButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -550,7 +564,7 @@ deleteServers.addActionListener(new ActionListener(){
 				changes.add(str);
 			}
 		});
-		JButton back= new JButton("Back");
+		
 		back.addActionListener(new ActionListener() {
 
 			@Override
@@ -558,18 +572,12 @@ deleteServers.addActionListener(new ActionListener(){
 				openFrame();
 			}
 		});
-		globalConstraints.gridx = 60;
-		globalConstraints.gridy = 100;
-		configPan.add(back, globalConstraints);
-		JButton push = new JButton("PushConfiguration");
-		globalConstraints.gridx = 60;
-		globalConstraints.gridy = 60;
-		globalConstraints.insets = new Insets(40, 40, 40, 40);
-		configPan.add(push, globalConstraints);
-		JButton Done = new JButton("DonePushing");
-
-		globalConstraints.gridy = 80;
-		configPan.add(Done, globalConstraints);
+		
+		
+		
+		
+		
+		
 		Done.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
