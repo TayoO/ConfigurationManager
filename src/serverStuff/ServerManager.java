@@ -32,16 +32,16 @@ class ServerManager {
 	final BasicFrame frameManager = new BasicFrame();
 	final JPanel introPan = new JPanel(new GridBagLayout());
 	//static Scanner in = new Scanner(System.in);
+int five=5;
+// An array is used because final objects can't be set to new values, but changing values inside objects doesn't count as a change
+final boolean [] finished= new boolean [1];
+	
+	 
 
-	 final boolean [] finished= new boolean [1];
-	 finished[0]=false;
 	 
 	 final JPanel autoPan= new JPanel(new GridBagLayout());
 	 FlowLayout experimentLayout = new FlowLayout();
-		autoPan.setLayout(experimentLayout);
 		
-		JButton back= new JButton("Back");
-		autoPan.add(back);
 		
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		final ServerManager main = new ServerManager();
@@ -389,6 +389,10 @@ frameManager.setVisible(true);
 
 	}
  public String []  autoPanel(final JPanel nextPan, String ... sects){
+	 autoPan.setLayout(experimentLayout);
+		finished[0]=false;
+		JButton back= new JButton("Back");
+		autoPan.add(back);
 	 back.addActionListener(new ActionListener() {
 			
 			@Override
