@@ -33,6 +33,16 @@ class ServerManager {
 	final JPanel introPan = new JPanel(new GridBagLayout());
 	//static Scanner in = new Scanner(System.in);
 
+	 final boolean [] finished= new boolean [1];
+	 finished[0]=false;
+	 
+	 final JPanel autoPan= new JPanel(new GridBagLayout());
+	 FlowLayout experimentLayout = new FlowLayout();
+		autoPan.setLayout(experimentLayout);
+		
+		JButton back= new JButton("Back");
+		autoPan.add(back);
+		
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		final ServerManager main = new ServerManager();
 		
@@ -96,7 +106,6 @@ class ServerManager {
 				serverListManagement();
 			}
 		});
-		System.out.println("hey");
 		frameManager.getContentPane().removeAll();
 		frameManager.add(introPan);
 		System.out.println("intro pan");
@@ -380,19 +389,24 @@ frameManager.setVisible(true);
 
 	}
  public String []  autoPanel(final JPanel nextPan, String ... sects){
-	 final boolean [] finished= new boolean [1];
-	 finished[0]=false;
-	 String [] output=new String [sects.length];
-	 final JPanel autoPan= new JPanel(new GridBagLayout());
-	 FlowLayout experimentLayout = new FlowLayout();
-		autoPan.setLayout(experimentLayout);
+	 back.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openFrame();
+			}
+		});
+		
+		String [] output=new String [sects.length];
+		
 		final JComponent [] comp= new JComponent[sects.length];
 		for (int i=0; i<sects.length; i++){
 	
 			if (i%2==1){
 				// Only used since final variables must be used for action performed.
 				final int x=i;
-				comp[i] = new JTextField(sects[i].substring(1,sects.length));
+				
+				comp[i] = new JTextField(sects[i]);
 			( (JTextField) comp[i]).addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent e){
                             ((JTextComponent) comp[x]).getText();
@@ -406,8 +420,11 @@ frameManager.setVisible(true);
 			
 		}
 	 JButton done = new JButton("Done");
-	 done.addActionListener(new ActionListener(){
+	 
+
+	done.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
+				
 				frameManager.getContentPane().removeAll();
 				frameManager.add(nextPan);
 				finished[1]=true;
@@ -416,9 +433,11 @@ frameManager.setVisible(true);
 				frameManager.revalidate();
 						frameManager.pack();
 						frameManager.setVisible(true);
-			}
+			 }
 		});
+	
 	 autoPan.add(done);
+	 System.out.println("removeAll");
 	 frameManager.getContentPane().removeAll();
 		frameManager.add(autoPan);
 		System.out.println("auto pan");
@@ -432,6 +451,7 @@ frameManager.setVisible(true);
 				}
 	return output;	
  }
+ 
  
 	public void serverListManagement(){
 		System.out.println("heh");
@@ -485,6 +505,7 @@ deleteGroups.addActionListener(new ActionListener(){
 
 addingServers.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e){
+		
 		String [] results=autoPanel(introPan, "lid:","tEnter id here, must be a number","lnumber","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC",
 			
 				"lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342");
@@ -529,32 +550,39 @@ deleteServers.addActionListener(new ActionListener(){
 		
 
 		final JPanel configPan = new JPanel(new GridBagLayout());
-		final JTextArea editTextArea = new JTextArea("ExampleServer,ExampleSection,ExampleVariable,ExampleValue");
+		
+		
+		
 		JButton configButton = new JButton("New Configuration");
 		JButton back= new JButton("Back");
 		JButton push = new JButton("PushConfiguration");
+		JButton Done = new JButton("DonePushing");
+		final JTextArea editTextArea = new JTextArea("ExampleServer,ExampleSection,ExampleVariable,ExampleValue");
 		
 		globalConstraints.gridx = 100;
 		globalConstraints.gridy = 100;
 		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		configPan.add(configButton, globalConstraints);
-		JButton Done = new JButton("DonePushing");
+		
 		
 		
 		globalConstraints.gridx = 80;
-		
 		configPan.add(back, globalConstraints);
+		
 		globalConstraints.gridx = 60;
-		globalConstraints.gridy = 60;
+		
 		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		configPan.add(push, globalConstraints);
 		
-		
+		globalConstraints.gridy = 60;
 		configPan.add(back, globalConstraints);
+		
 		globalConstraints.gridy = 80;
 		configPan.add(Done, globalConstraints);
+		
 		globalConstraints.gridy = 40;
 		configPan.add(editTextArea, globalConstraints);
+		
 		configButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -613,7 +641,6 @@ deleteServers.addActionListener(new ActionListener(){
 			}
 		});
 		
-		frameManager.add(configPan);
 		push.addActionListener(new ActionListener() {
 
 			@Override
@@ -625,7 +652,12 @@ deleteServers.addActionListener(new ActionListener(){
 			}
 		});
 
+		frameManager.getContentPane().removeAll();
+		frameManager.add(configPan);
+		System.out.println("config Pan");
 		frameManager.revalidate();
+		frameManager.pack();
+		frameManager.setVisible(true);
 	}
 
 	
