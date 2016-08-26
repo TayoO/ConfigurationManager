@@ -32,16 +32,16 @@ class ServerManager {
 	final BasicFrame frameManager = new BasicFrame();
 	final JPanel introPan = new JPanel(new GridBagLayout());
 	//static Scanner in = new Scanner(System.in);
-int five=5;
+
 // An array is used because final objects can't be set to new values, but changing values inside objects doesn't count as a change
 final boolean [] finished= new boolean [1];
 	
 	 
 
+
+FlowLayout autoLayout = new FlowLayout();
+	 final JPanel autoPan= new JPanel(autoLayout);
 	 
-	 final JPanel autoPan= new JPanel(new GridBagLayout());
-	 FlowLayout experimentLayout = new FlowLayout();
-		
 		
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		final ServerManager main = new ServerManager();
@@ -213,7 +213,7 @@ public void deleteServerSQL(int id){
 	
 }
 	public String [] getGroups(){
-		{
+		
 			System.out.println("get groups");
 			String [] departs;
 			String [] types;
@@ -279,17 +279,14 @@ public void deleteServerSQL(int id){
 		//main.ServerManagerFrame();
 		//main.configFrame();
 		System.out.println("powerscript path listed as" + this.powershell);
+
+		return SQLGroups(departs, types);
 		
-		
-
-
-
-		}
-		return null;
 		
 	}
 // Choosing which server to push configuration to	
 	public String [] chooseServer(){
+		System.out.println("gweeg3");
 		 final JPanel choosePan = new JPanel(new GridBagLayout());
 		final ArrayList<String> chosenServers = new ArrayList<String>();
 		
@@ -389,7 +386,6 @@ frameManager.setVisible(true);
 
 	}
  public String []  autoPanel(final JPanel nextPan, String ... sects){
-	 autoPan.setLayout(experimentLayout);
 		finished[0]=false;
 		JButton back= new JButton("Back");
 		autoPan.add(back);
@@ -458,10 +454,10 @@ frameManager.setVisible(true);
  
  
 	public void serverListManagement(){
-		System.out.println("heh");
-		final JPanel listPan = new JPanel(new GridBagLayout());
-		FlowLayout experimentLayout = new FlowLayout();
-		listPan.setLayout(experimentLayout);
+		FlowLayout serverLayout = new FlowLayout();
+		 JPanel listPan = new JPanel(serverLayout);
+		
+		//listPan.setLayout(serverLayout);
 		JButton addingGroups = new JButton("Add Groups");
 		JButton modifyGroups = new JButton("Modify Groups");
 		JButton deleteGroups = new JButton("Delete Groups");
@@ -477,9 +473,11 @@ listPan.add(deleteGroups, globalConstraints);
 listPan.add(addingServers, globalConstraints);
 listPan.add(modifyServers, globalConstraints);
 listPan.add(deleteServers, globalConstraints);
+final JPanel [] list= new JPanel[1];
+list[0]=listPan;
 frameManager.getContentPane().removeAll();
 		System.out.println("list pan");
-		frameManager.getContentPane().add(listPan, BorderLayout.WEST);
+		frameManager.getContentPane().add(listPan);
 		frameManager.revalidate();
 				frameManager.pack();
 				frameManager.setVisible(true);
@@ -509,11 +507,73 @@ deleteGroups.addActionListener(new ActionListener(){
 
 addingServers.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e){
+		FlowLayout addLayout = new FlowLayout();
+		 final JPanel addPan= new JPanel(addLayout);
+		String [] sects={"id:","Enter id here, must be a number","number","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC",
 		
-		String [] results=autoPanel(introPan, "lid:","tEnter id here, must be a number","lnumber","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC",
-			
-				"lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342");
-		System.out.println(results[0]+results[1]+results[2]+results[3]+results[4]+results[5]+results[6]+results[7]);	
+				"lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342"};
+		
+	JLabel id = new JLabel ("id");
+	final TextField idInput= new TextField ("");
+	JLabel number = new JLabel ("number");
+	final TextField numberInput= new TextField ("");
+	final JLabel type = new JLabel ("type");
+	final TextField typeInput= new TextField ("");
+	JLabel dep = new JLabel ("department");
+	final TextField depInput= new TextField ("");
+	JLabel cif = new JLabel ("cif");
+	final TextField cifInput= new TextField ("");
+	final JLabel ip = new JLabel ("ip");
+	final TextField ipInput= new TextField ("");
+	addPan.add(id);
+	addPan.add(idInput);
+	addPan.add(number);
+	addPan.add(numberInput);
+	addPan.add(type);
+	addPan.add(typeInput);
+	addPan.add(dep);
+	addPan.add(depInput);
+	addPan.add(cif);
+	addPan.add(cifInput);
+	addPan.add(ip);
+	addPan.add(ipInput);
+	JButton done=new JButton("Done");
+	addPan.add(done);
+	done.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try{
+			addServerSQL(idInput.getText(), numberInput.getText(), typeInput.getText(), depInput.getText(), cifInput.getText(), ipInput.getText());
+			}
+			catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	});
+	
+	JButton back= new JButton("Back");
+	addPan.add(back);
+	back.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			openFrame();
+		}
+	});
+	
+	
+		frameManager.getContentPane().removeAll();
+		
+		System.out.println("add pan");
+		//frameManager.getContentPane().add(list[0]);
+		frameManager.add(addPan);
+		frameManager.revalidate();
+				frameManager.pack();
+				frameManager.setVisible(true);
+		//String [] results=addPan();//autoPanel(introPan, "lid:","tEnter id here, must be a number","lnumber","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC","lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342");
+		//System.out.println(results[0]+results[1]+results[2]+results[3]+results[4]+results[5]+results[6]+results[7]);	
 System.out.println("adding Serv");
 
 
@@ -532,7 +592,45 @@ modifyServers.addActionListener(new ActionListener(){
 
 deleteServers.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e){
-		
+		FlowLayout delLayout = new FlowLayout();
+		 final JPanel delPan= new JPanel(delLayout);
+		 JLabel id = new JLabel ("id");
+			final TextField idInput= new TextField ("");
+			JButton done=new JButton("Done");
+			delPan.add(done);
+			delPan.add(id);
+			delPan.add(idInput);
+			done.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try{
+					deleteServerSQL(Integer.parseInt(idInput.getText()));
+					}
+					catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			});
+			
+			JButton back= new JButton("Back");
+			delPan.add(back);
+			back.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openFrame();
+				}
+			});
+			frameManager.getContentPane().removeAll();
+			
+			System.out.println("del pan");
+			//frameManager.getContentPane().add(list[0]);
+			frameManager.add(delPan);
+			frameManager.revalidate();
+					frameManager.pack();
+					frameManager.setVisible(true);
 	}
 });		
 
@@ -540,11 +638,14 @@ deleteServers.addActionListener(new ActionListener(){
 	}
 	
 	
-	
-	
+	public String [] addPan()
+	{
+		 return null;
+	}
     public void configurations() {
-	
-			
+	System.out.println("gweeg");
+			final String [] x=chooseServer();
+			System.out.println("gweeg2");
 		final ArrayList<String> changes = new ArrayList<String>();
 		
 		// final int counter=0;
@@ -616,7 +717,7 @@ deleteServers.addActionListener(new ActionListener(){
 				String[] test = new String[0];
 				try {
 					System.out.println("pushing changes"+changes.toArray(test)[0]);
-					pushConfiguration(chooseServer(), changes.toArray(test));
+					pushConfiguration(x, changes.toArray(test));
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -624,14 +725,7 @@ deleteServers.addActionListener(new ActionListener(){
 			}
 		});
 	
-
-		//2. Optional: What happens when the frame closes?
 		frameManager.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		//3. Create components and put them in the frame.
-		//...create emptyLabel...
-		frameManager.getContentPane().removeAll();
-		//frameManager.getContentPane().add( BorderLayout.CENTER, Done);
 
 		
 		
@@ -663,8 +757,5 @@ deleteServers.addActionListener(new ActionListener(){
 		frameManager.pack();
 		frameManager.setVisible(true);
 	}
-
-	
-
 
 }
