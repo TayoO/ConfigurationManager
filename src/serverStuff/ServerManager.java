@@ -45,7 +45,6 @@ FlowLayout autoLayout = new FlowLayout();
 		
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		final ServerManager main = new ServerManager();
-		
 		main.openFrame();
 }
 	/*
@@ -95,7 +94,7 @@ FlowLayout autoLayout = new FlowLayout();
 			public void actionPerformed(ActionEvent e) {
 				frameManager.getContentPane().removeAll();
 				
-				configurations();
+				chooseServer();
 			}
 		});
 		serv.addActionListener(new ActionListener() {
@@ -212,8 +211,7 @@ public void deleteServerSQL(int id){
 			}
 	
 }
-	public String [] getGroups(){
-		
+	public void getGroups(){
 			System.out.println("get groups");
 			String [] departs;
 			String [] types;
@@ -280,13 +278,13 @@ public void deleteServerSQL(int id){
 		//main.configFrame();
 		System.out.println("powerscript path listed as" + this.powershell);
 
-		return SQLGroups(departs, types);
+		configurations(SQLGroups(departs, types));
 		
 		
 	}
 // Choosing which server to push configuration to	
-	public String [] chooseServer(){
-		System.out.println("gweeg3");
+	public void chooseServer(){
+
 		 final JPanel choosePan = new JPanel(new GridBagLayout());
 		final ArrayList<String> chosenServers = new ArrayList<String>();
 		
@@ -294,40 +292,70 @@ public void deleteServerSQL(int id){
 		JButton toGroups = new JButton("Push to Groups");
 		globalConstraints.gridx=40;
 		globalConstraints.gridy=40;
-		JButton toServ   = new JButton("Push to individual Servers");
+		choosePan.add(toGroups,globalConstraints);
 		toGroups.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Collections.addAll(chosenServers,getGroups());
+				getGroups();
 			}
 		});
+		JButton toServ   = new JButton("Push to individual Servers");
+		globalConstraints.gridx=80;
 		toServ.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Collections.addAll(chosenServers,getServs());
+				getServs();
 			}
 		});
-		choosePan.add(toGroups,globalConstraints);
-		globalConstraints.gridx=80;
 		choosePan.add(toServ,globalConstraints);
-			
 		
+		JButton back = new JButton ("Back");
+		globalConstraints.gridx=40;
+		globalConstraints.gridy=80;
+		choosePan.add(back, globalConstraints);
+		back.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openFrame();
+			}
+		});
 		
-		String [] temp = {};
-		return chosenServers.toArray(temp);
+		JButton done = new JButton ("Done");
+		globalConstraints.gridx=40;
+		globalConstraints.gridy=80;
+		choosePan.add(done, globalConstraints);
+		done.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openFrame();
+			}
+		});
+		
+		
+		frameManager.getContentPane().removeAll();
+		frameManager.add(choosePan);
+		System.out.println("choose pan");
+		frameManager.revalidate();
+		frameManager.pack();
+		frameManager.setVisible(true);
+		
+		
+		
 	}
 	// Combines the server info with changes than passes it on to push line by
 	// line
 	
-	protected String [] getServs() {
-		final String[] serv=new String [1];
+	protected void getServs() {
+		final ArrayList<String> servs = new ArrayList<String>();
+		
 		final JPanel servPan = new JPanel(new GridBagLayout());
 		final JTextArea editTextArea = new JTextArea("Enter servername here");
 
-		JButton servButton = new JButton("Done");
+		JButton servButton = new JButton("addServer");
 		globalConstraints.gridx = 100;
 		globalConstraints.gridy = 100;
 		globalConstraints.insets = new Insets(40, 40, 40, 40);
@@ -335,6 +363,18 @@ public void deleteServerSQL(int id){
 
 		globalConstraints.gridy = 40;
 		servPan.add(editTextArea, globalConstraints);
+		globalConstraints.gridx = 40;
+		JButton done = new JButton("Done");
+		servPan.add(done,globalConstraints);
+		done.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String [] temp = {};
+				configurations((servs).toArray(temp));
+				
+			}
+		});
 		frameManager.getContentPane().removeAll();
 frameManager.add(servPan);
 System.out.println("serv pan");
@@ -345,12 +385,12 @@ frameManager.setVisible(true);
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				serv [0]= editTextArea.getText();
+				(servs).add( editTextArea.getText());
 				editTextArea.setText(" ");
 				
 			}
 		});
-		return null;
+	
 	}
 	public void pushConfiguration(String[] servers, String[] change) throws IOException {
 		File log = new File("U:\\test\\changes2.csv");
@@ -381,10 +421,6 @@ frameManager.setVisible(true);
 	// Pushes the lines to file
 	// Dedicated method to make it easier to modify how individual lines are
 	// formatted
-	public void pushConfiguration(String line, PrintWriter out) {
-		out.println(line + "\r\n");
-
-	}
  public String []  autoPanel(final JPanel nextPan, String ... sects){
 		finished[0]=false;
 		JButton back= new JButton("Back");
@@ -637,15 +673,8 @@ deleteServers.addActionListener(new ActionListener(){
 
 	}
 	
-	
-	public String [] addPan()
-	{
-		 return null;
-	}
-    public void configurations() {
-	System.out.println("gweeg");
-			final String [] x=chooseServer();
-			System.out.println("gweeg2");
+    public void configurations(final String [] x) {
+		
 		final ArrayList<String> changes = new ArrayList<String>();
 		
 		// final int counter=0;
