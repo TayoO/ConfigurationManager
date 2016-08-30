@@ -10,8 +10,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -20,32 +24,36 @@ import javax.swing.text.JTextComponent;
 
 
 class ServerManager {
-	static String path = "c:/temp/opentext.ini";
-	static final int ARBITRARY_LIMIT = 10;
+	//static String path = "c:/temp/opentext.ini";
+	
+	//This is the path to the powershell code
 	String powershell = "powershell C:\\Users\\oduekea\\workspace\\shelltest.ps1";
-	static String[] groupNames;
-	Server[] serverList;
-	static String[] serverNames;
-	boolean[][] associations;
-	GridBagConstraints globalConstraints = new GridBagConstraints();
+
+	// Instead of creating unique gridbag constraints each time, I just use one and modify it for each situation
+	//Another possibility would be to use unique constraints for back and done buttons to keep it consistent across screens
+	static GridBagConstraints globalConstraints = new GridBagConstraints();
+
+	
+	
 //Outside of droplist applets all graphics go on this one frame.
 	final BasicFrame frameManager = new BasicFrame();
+	
+	// Intro panel is the first panel that appears when 
 	final JPanel introPan = new JPanel(new GridBagLayout());
 	//static Scanner in = new Scanner(System.in);
 
 // An array is used because final objects can't be set to new values, but changing values inside objects doesn't count as a change
-final boolean [] finished= new boolean [1];
+
 	
 	 
 
 
-FlowLayout autoLayout = new FlowLayout();
-	 final JPanel autoPan= new JPanel(autoLayout);
-	 
 		
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
-		final ServerManager main = new ServerManager();
-		main.openFrame();
+		//initiating an new configuration object
+		ServerManager main = new ServerManager();
+		//running the configuration object
+		main.startManager();
 }
 	/*
 	 * file code: numGroups numServers listOfGroupNames seperated by commas
@@ -54,30 +62,52 @@ FlowLayout autoLayout = new FlowLayout();
 	 * Example] 5 6 frontEnd, BackEnd, PWGSC, SSC, RCMP PWFE, PWBE, SSCFE,
 	 * SSCBE, RCMPFE, RCMPBE 1,3,5 2,4,6 1,2h 5,6
 	 */
-	public void openFrame(){
+	
+	public void serverManager(){
+		//Insets means no matter what else, all buttons will maintain are certain distance from the edges of the panel/frame. The larger the integer values passed, the further from the edges it goes.
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
+	}
+	
+	
+	//startManager runs the introPan. The intro pan is the first panel that the user sees. 
+	//From here the user can choose to manage the list of servers and go to serverManagerList, or try to push configurations, which means they must first go to chooseServers to pick which servers they push too.
+	public void startManager(){
 		
 		//Constraints
+
 		globalConstraints.gridx = 100;
-		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		globalConstraints.gridy = 40;
 		
 		
-		
-		final JTextArea title = new JTextArea("Content Server Configuration Manager");
-		
-		JButton config = new JButton("Push configurations");
+		// Displays the tile of the application
+		final JLabel title = new JLabel("Content Server Configuration Manager");
+		globalConstraints.gridy = 20;
+		globalConstraints.gridx = 40;
+		introPan.add(title, globalConstraints);
+
+		//Button to manage the list of Servers
 		JButton serv  = new JButton("Manage ServerList");
+		serv.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frameManager.getContentPane().removeAll();
+				serverListManagement();
+			}
+		});
 		globalConstraints.gridx = 40;
 		introPan.add(serv, globalConstraints);
+		
+		
+		//Button to push configurations
+		JButton config = new JButton("Push configurations");
 		globalConstraints.gridx = 100;
         introPan.add(config, globalConstraints);
 
 		//globalConstraints.gridy = 70;
 		//final JTextArea powerShellInfoText = new JTextArea("powerscript path listed as" + this.powershell);JButton serv = new JButton("Manage ServerList");
 		//introPan.add(powerShellInfoText, globalConstraints);
-		globalConstraints.gridy = 20;
-		globalConstraints.gridx = 40;
-		introPan.add(title, globalConstraints);
+		
 /*
 		introButton.addActionListener(new ActionListener() {
 
@@ -94,17 +124,15 @@ FlowLayout autoLayout = new FlowLayout();
 			public void actionPerformed(ActionEvent e) {
 				frameManager.getContentPane().removeAll();
 				
-				chooseServer();
+				try {
+					chooseServers();
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
-		serv.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				frameManager.getContentPane().removeAll();
-				serverListManagement();
-			}
-		});
+		
 		frameManager.getContentPane().removeAll();
 		frameManager.add(introPan);
 		System.out.println("intro pan");
@@ -113,6 +141,8 @@ FlowLayout autoLayout = new FlowLayout();
 		frameManager.setVisible(true);
 	
 	}
+	
+	//This class directly access the SQL code to get the servers that have any combination of the given department or type options
 	public String[] SQLGroups(String[] departs, String[] type) {
 		// Variables for sql connection
 		Connection c = null;
@@ -160,6 +190,8 @@ FlowLayout autoLayout = new FlowLayout();
 		return (String[]) names.toArray(exampleArray);
 	}
 
+	
+	//This class adds a server with the given values
 	public void addServerSQL(String id, String number, String type, String dep, String cif, String ip) throws ClassNotFoundException, SQLException{
 
 	    
@@ -178,7 +210,8 @@ FlowLayout autoLayout = new FlowLayout();
 			System.exit(0);
 		}
 	}
-public void modifyServerSQL(int id, String columnName, String change) {
+//This method modifies a column given by the column in the server, given by the id,  to the value given in the change
+	public void modifyServerSQL(int id, String columnName, String change) {
 
 	    
 	    Connection c = null;
@@ -195,7 +228,9 @@ public void modifyServerSQL(int id, String columnName, String change) {
 			System.exit(0);
 		}
 	}
-public void deleteServerSQL(int id){
+//This methods deletes the server given by the id
+	
+	public void deleteServerSQL(int id){
 	  Connection c = null;
 			Statement stmt = null;
 			
@@ -211,19 +246,26 @@ public void deleteServerSQL(int id){
 			}
 	
 }
-	public void getGroups(){
-			System.out.println("get groups");
-			String [] departs;
-			String [] types;
-		String [] departmentList={"VAC","SSC","RCMP","PWGSC"};
+	//This method, when working properly, gets the list of departments and the list of types that are to be pushed to from dropDownListThread objects. 
+	public void getGroups() throws InterruptedException{
+
+		String [] departs={"SSC","RCMP"};
+		
+	
+	
+       
+		String [] types={"AC","FE"};
 		String [] typeList={"AD","AG","FE","ID"};
-		DropDownListThread chooseDep=new DropDownListThread(departmentList);
+		/*
+	System.out.println("get groups");
+	
+
+		
 		
 		synchronized(chooseDep){
             try{
             	
-                System.out.println("Waiting for departments to be choosen...");
-                chooseDep.run( 200, 125);
+                
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
@@ -243,19 +285,28 @@ public void deleteServerSQL(int id){
  }
            
         }
+        */
 		// Copy pasted code from previous lines.
-		DropDownListThread chooseType=new DropDownListThread(typeList);
+		/*
+		
 		 
 		
 		synchronized(chooseType){
             try{
             	
-                System.out.println("Waiting for types to be choosen...");
-                chooseType.run( 200, 125);
+                
+                
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
+            
+		DropDownListThread chooseType=new DropDownListThread(typeList);
+		chooseType.run( 200, 125);
+		System.out.println("Waiting for types to be choosen...");
             types=chooseType.results;
+            */
+		
+            
  if (types.length==0){
 	 System.out.println("no types chosen");
  }
@@ -269,7 +320,7 @@ public void deleteServerSQL(int id){
 		 System.out.println(types[i]);
 	 }
  }
-		}
+		
 		// main.loadDefault();
 
 
@@ -283,10 +334,11 @@ public void deleteServerSQL(int id){
 		
 	}
 // Choosing which server to push configuration to	
-	public void chooseServer(){
+
+	// Allows the user to choose Servers, either by individual servers or by groups
+	public void chooseServers() throws InterruptedException{
 
 		 final JPanel choosePan = new JPanel(new GridBagLayout());
-		final ArrayList<String> chosenServers = new ArrayList<String>();
 		
 
 		JButton toGroups = new JButton("Push to Groups");
@@ -297,7 +349,12 @@ public void deleteServerSQL(int id){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getGroups();
+				try {
+					getGroups();
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		JButton toServ   = new JButton("Push to individual Servers");
@@ -319,7 +376,7 @@ public void deleteServerSQL(int id){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openFrame();
+				startManager();
 			}
 		});
 		
@@ -331,7 +388,7 @@ public void deleteServerSQL(int id){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openFrame();
+				startManager();
 			}
 		});
 		
@@ -348,7 +405,7 @@ public void deleteServerSQL(int id){
 	}
 	// Combines the server info with changes than passes it on to push line by
 	// line
-	
+	// Chooses servers by directly entering the server names
 	protected void getServs() {
 		final ArrayList<String> servs = new ArrayList<String>();
 		
@@ -358,7 +415,6 @@ public void deleteServerSQL(int id){
 		JButton servButton = new JButton("addServer");
 		globalConstraints.gridx = 100;
 		globalConstraints.gridy = 100;
-		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		servPan.add(servButton, globalConstraints);
 
 		globalConstraints.gridy = 40;
@@ -392,7 +448,9 @@ frameManager.setVisible(true);
 		});
 	
 	}
-	public void pushConfiguration(String[] servers, String[] change) throws IOException {
+	
+	// This methods gets a list of servers to push to and a list of changes to push and pushes all the changes to each server
+public void pushConfiguration(String[] servers, String[] change) throws IOException {
 		File log = new File("U:\\test\\changes2.csv");
 		try {
 			if (log.exists() == false) {
@@ -421,15 +479,29 @@ frameManager.setVisible(true);
 	// Pushes the lines to file
 	// Dedicated method to make it easier to modify how individual lines are
 	// formatted
+	
+	
+	
+	
+	
+	//Autopanel is the only panel that is softcoded. In this context what that means is that the contents of the panel can vary based of what values are passed to the method. For this reason, flowlayouts are used instead of hardcoded gridConstraints.
  public String []  autoPanel(final JPanel nextPan, String ... sects){
-		finished[0]=false;
+		//FlowLayout automatically formats components inside  in a horizzontal layout based on the order they are added. This removes the need for gridConstraints. It is used when the formatting need to be done automatically and scale for various numbers of buttons instead of hard coded
+		
+		FlowLayout autoLayout = new FlowLayout();
+
+		
+		 final JPanel autoPan= new JPanel(autoLayout);
+		 
+	 final boolean [] finished= new boolean [1];
+	 finished[0]=false;
 		JButton back= new JButton("Back");
 		autoPan.add(back);
 	 back.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openFrame();
+				startManager();
 			}
 		});
 		
@@ -440,12 +512,14 @@ frameManager.setVisible(true);
 	
 			if (i%2==1){
 				// Only used since final variables must be used for action performed.
-				final int x=i;
+				
+				// only final objects can be referenced in the actionListener
+				final int unchangeableInt=i;
 				
 				comp[i] = new JTextField(sects[i]);
 			( (JTextField) comp[i]).addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent e){
-                            ((JTextComponent) comp[x]).getText();
+                            ((JTextComponent) comp[unchangeableInt]).getText();
 					}
 				});
 			}
@@ -488,7 +562,7 @@ frameManager.setVisible(true);
 	return output;	
  }
  
- 
+ // This frame gives options on how to modify the server list. Currently only addServer works, deleteServer has also been attempted but buggy
 	public void serverListManagement(){
 		FlowLayout serverLayout = new FlowLayout();
 		 JPanel listPan = new JPanel(serverLayout);
@@ -499,7 +573,6 @@ frameManager.setVisible(true);
 		JButton deleteGroups = new JButton("Delete Groups");
 		globalConstraints.gridx = 100;
 		globalConstraints.gridy = 100;
-		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		JButton addingServers = new JButton("Add Servers");
 		JButton modifyServers = new JButton("Modify Servers");
 		JButton deleteServers = new JButton("Delete Servers");
@@ -509,6 +582,8 @@ listPan.add(deleteGroups, globalConstraints);
 listPan.add(addingServers, globalConstraints);
 listPan.add(modifyServers, globalConstraints);
 listPan.add(deleteServers, globalConstraints);
+
+//final array of 1 used so that the value of the JPanel object can be modified without changing the way it is refferenced, so it can be used inside an actionListener
 final JPanel [] list= new JPanel[1];
 list[0]=listPan;
 frameManager.getContentPane().removeAll();
@@ -545,21 +620,19 @@ addingServers.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e){
 		FlowLayout addLayout = new FlowLayout();
 		 final JPanel addPan= new JPanel(addLayout);
-		String [] sects={"id:","Enter id here, must be a number","number","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC",
+
 		
-				"lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342"};
-		
-	JLabel id = new JLabel ("id");
+	JLabel id = new JLabel ("Enter id here, must be a number");
 	final TextField idInput= new TextField ("");
-	JLabel number = new JLabel ("number");
+	JLabel number = new JLabel ("Enter the server number here (the e.g for GCDOCS-45393 type 45393");
 	final TextField numberInput= new TextField ("");
-	final JLabel type = new JLabel ("type");
+	final JLabel type = new JLabel ("Enter type here 2 characters");
 	final TextField typeInput= new TextField ("");
-	JLabel dep = new JLabel ("department");
+	JLabel dep = new JLabel ("Enter the department acronym here eg SSC");
 	final TextField depInput= new TextField ("");
-	JLabel cif = new JLabel ("cif");
+	JLabel cif = new JLabel ("Enter cif here must be a number eg 1");
 	final TextField cifInput= new TextField ("");
-	final JLabel ip = new JLabel ("ip");
+	final JLabel ip = new JLabel ("Enter ip here 1430-3212-2342");
 	final TextField ipInput= new TextField ("");
 	addPan.add(id);
 	addPan.add(idInput);
@@ -595,7 +668,7 @@ addingServers.addActionListener(new ActionListener(){
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			openFrame();
+			startManager();
 		}
 	});
 	
@@ -656,7 +729,7 @@ deleteServers.addActionListener(new ActionListener(){
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					openFrame();
+					startManager();
 				}
 			});
 			frameManager.getContentPane().removeAll();
@@ -672,9 +745,8 @@ deleteServers.addActionListener(new ActionListener(){
 
 
 	}
-	
-    public void configurations(final String [] x) {
-		
+	// This method gets the changes that are going to be pushed and calls the method to push them passing the servers that they are being pushed to
+    public void configurations(final String [] serversToPushTo) {
 		final ArrayList<String> changes = new ArrayList<String>();
 		
 		// final int counter=0;
@@ -695,7 +767,6 @@ deleteServers.addActionListener(new ActionListener(){
 		
 		globalConstraints.gridx = 100;
 		globalConstraints.gridy = 100;
-		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		configPan.add(configButton, globalConstraints);
 		
 		
@@ -705,7 +776,6 @@ deleteServers.addActionListener(new ActionListener(){
 		
 		globalConstraints.gridx = 60;
 		
-		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		configPan.add(push, globalConstraints);
 		
 		globalConstraints.gridy = 60;
@@ -731,7 +801,7 @@ deleteServers.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openFrame();
+				startManager();
 			}
 		});
 		
@@ -746,7 +816,7 @@ deleteServers.addActionListener(new ActionListener(){
 				String[] test = new String[0];
 				try {
 					System.out.println("pushing changes"+changes.toArray(test)[0]);
-					pushConfiguration(x, changes.toArray(test));
+					pushConfiguration(serversToPushTo, changes.toArray(test));
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

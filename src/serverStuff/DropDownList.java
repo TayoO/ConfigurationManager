@@ -29,13 +29,19 @@ LinkedList<String> results=new LinkedList();
 public boolean done=false;
 
 private int count = 0;
+public DropDownList()
+{
+	String [] example={"Ebullient", "Obtuse", "Recalcitrant",
+			   "Brilliant", "Somnescent", "Timorous", "Florid", "Putrescent"};
+	description=example;
+}
 public DropDownList(String [] options)
 {
 	description=options;
 }
 
 public void init() {
- for (int i = 0; i < 4; i++)
+ for (int i = 0; i < description.length; i++)
    c.addItem(description[count++]);
  t.setEditable(false);
  b.addActionListener(new ActionListener() {
@@ -72,9 +78,8 @@ public void init() {
 }
 
 public static void main(String[] args) {
-	String [] example={"Ebullient", "Obtuse", "Recalcitrant",
-			   "Brilliant", "Somnescent", "Timorous", "Florid", "Putrescent"};
-	DropDownList x=new DropDownList(example);
+
+	DropDownList x=new DropDownList();
  x.run( 200, 125);
 }
 
