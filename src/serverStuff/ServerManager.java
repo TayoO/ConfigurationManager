@@ -37,7 +37,7 @@ class ServerManager {
 	
 //Outside of droplist applets all graphics go on this one frame.
 	final BasicFrame frameManager = new BasicFrame();
-	
+
 	// Intro panel is the first panel that appears when 
 	final JPanel introPan = new JPanel(new GridBagLayout());
 	//static Scanner in = new Scanner(System.in);
@@ -51,8 +51,10 @@ class ServerManager {
 		
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		//initiating an new configuration object
+		
 		ServerManager main = new ServerManager();
 		//running the configuration object
+		SQLShowServs();
 		main.startManager();
 }
 	/*
@@ -65,14 +67,14 @@ class ServerManager {
 	
 	public void serverManager(){
 		//Insets means no matter what else, all buttons will maintain are certain distance from the edges of the panel/frame. The larger the integer values passed, the further from the edges it goes.
-		globalConstraints.insets = new Insets(40, 40, 40, 40);
+		//globalConstraints.insets = new Insets(40, 40, 40, 40);
 	}
 	
 	
 	//startManager runs the introPan. The intro pan is the first panel that the user sees. 
 	//From here the user can choose to manage the list of servers and go to serverManagerList, or try to push configurations, which means they must first go to chooseServers to pick which servers they push too.
 	public void startManager(){
-		
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
 		//Constraints
 
 		globalConstraints.gridx = 100;
@@ -81,7 +83,7 @@ class ServerManager {
 		
 		// Displays the tile of the application
 		final JLabel title = new JLabel("Content Server Configuration Manager");
-		globalConstraints.gridy = 20;
+		globalConstraints.gridy = 0;
 		globalConstraints.gridx = 40;
 		introPan.add(title, globalConstraints);
 
@@ -95,7 +97,7 @@ class ServerManager {
 				serverListManagement();
 			}
 		});
-		globalConstraints.gridx = 40;
+		globalConstraints.gridy = 40;
 		introPan.add(serv, globalConstraints);
 		
 		
@@ -143,7 +145,59 @@ class ServerManager {
 	}
 	
 	//This class directly access the SQL code to get the servers that have any combination of the given department or type options
-	public String[] SQLGroups(String[] departs, String[] type) {
+	protected static void SQLShowServs() {
+		Connection c = null;
+		Statement stmt = null;
+		ArrayList<String> names = new ArrayList<String>();
+		int counter=0;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			c = DriverManager.getConnection("jdbc:sqlite:test.db");
+			String sql="select * from sqlite_master";
+			stmt = c.createStatement();
+			ResultSet rs =stmt.executeQuery(sql);
+			System.out.print(" Databasename1: "+rs.getString("name"));
+			System.out.print("   "+rs.next()+" Databasename2: "+rs.getString("name"));
+			System.out.print("   "+rs.next()+" Databasename3: "+rs.getString("name"));
+			System.out.print("   "+rs.next());
+		stmt = c.createStatement();
+		sql = "Select * from Server;";
+		stmt.executeUpdate(sql);
+		rs = stmt.executeQuery(sql);
+		System.out.println("Results:");
+		while (rs.next()) {
+
+			System.out.print(" id: " +rs.getInt("id"));
+			String x = rs.getString("name");
+			System.out.print(" name: " +x);
+			if (names.add(x))
+				counter++;
+			System.out.print(" type: " +rs.getString("type"));
+			System.out.print(" dep: " +rs.getString("Department"));
+			System.out.print(" CIF: " +rs.getString("CIF"));
+			System.out.println(" IP: " +rs.getString("IP"));
+		}
+		} catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			System.exit(0);
+		}
+		 try { 
+		        stmt.close();
+		    } 
+		    catch (Exception ex) {
+		    }
+
+		    try { 
+		        c.close();
+		    } 
+		    catch (Exception ex) {
+		        System.out.println ("Error closing connections");
+		    }
+		String[] exampleArray = new String[counter];
+		
+	}
+	
+	public static String[] SQLGroups(String[] departs, String[] type) {
 		// Variables for sql connection
 		Connection c = null;
 		Statement stmt = null;
@@ -161,10 +215,7 @@ class ServerManager {
 					String sql = "Select * from Server where Department =\'" + departs[i] + "\'and Type=\'" + type[j]
 							+ "\';";
 					// sql="Select * from Server ;";
-					System.out.println("pre update");
 					stmt.executeUpdate(sql);
-					System.out.println("post update");
-
 					ResultSet rs = stmt.executeQuery(sql);
 					System.out.println("Results:" + rs.next());
 					while (rs.next()) {
@@ -175,9 +226,7 @@ class ServerManager {
 						System.out.println(x);
 						if (names.add(x))
 							counter++;
-						System.out.println("pre type");
 						System.out.println(rs.getString("type"));
-						System.out.println("after type");
 					}
 				}
 			}
@@ -192,7 +241,8 @@ class ServerManager {
 
 	
 	//This class adds a server with the given values
-	public void addServerSQL(String id, String number, String type, String dep, String cif, String ip) throws ClassNotFoundException, SQLException{
+	
+	public static void addServerSQL(String id, String number, String type, String dep, String cif, String ip) throws ClassNotFoundException, SQLException{
 
 	    
 	    Connection c = null;
@@ -209,9 +259,22 @@ class ServerManager {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			System.exit(0);
 		}
+		 try { 
+		        stmt.close();
+		    } 
+		    catch (Exception ex) {
+		    }
+
+		    try { 
+		        c.close();
+		    } 
+		    catch (Exception ex) {
+		        System.out.println ("Error closing connections");
+		    }
 	}
+	
 //This method modifies a column given by the column in the server, given by the id,  to the value given in the change
-	public void modifyServerSQL(int id, String columnName, String change) {
+	public static void modifyServerSQL(int id, String columnName, String change) {
 
 	    
 	    Connection c = null;
@@ -220,26 +283,61 @@ class ServerManager {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-		    String sql="UPDATE SERVER SET "+columnName+" ='"+change+"' WHERE ID ="+id+" );"; 
+		    String sql="UPDATE SERVER SET "+columnName+" ='"+change+"' WHERE ID ="+id+";"; 
 			stmt = c.createStatement();
 			stmt.executeUpdate(sql);
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			System.exit(0);
 		}
+		 try { 
+		        stmt.close();
+		    } 
+		    catch (Exception ex) {
+		    }
+
+		    try { 
+		        c.close();
+		    } 
+		    catch (Exception ex) {
+		        System.out.println ("Error closing connections");
+		    }
 	}
 //This methods deletes the server given by the id
 	
-	public void deleteServerSQL(int id){
+	public static void deleteServerSQL(int id){
 	  Connection c = null;
 			Statement stmt = null;
 			
 			try {
 				Class.forName("org.sqlite.JDBC");
 				c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			    String sql="DELETE FROM SERVER WHERE ID = "+id+";"; 
 				stmt = c.createStatement();
+				
+			    String sql="SELECT NAME FROM SERVER WHERE ID ="+id+";";
+			    ResultSet rs = stmt.executeQuery(sql);
+			    if (rs.next())
+			    {
+			    System.out.println("Results:" +rs.getString("name"));
+			    		sql="DELETE * FROM SERVER WHERE ID = "+id+";"; 
+			    		 sql="SELECT NAME FROM SERVER WHERE ID ="+id+";";
+					     rs = stmt.executeQuery(sql);
+					    if (rs.next())
+					    {
+					    System.out.println("Result not deleted:" +rs.getString("name"));
+		
+					    }
+					    else
+					    {
+					    	System.out.println("id deleted found");
+					    }
 				stmt.executeUpdate(sql);
+			    }
+			    else
+			    {
+			    	System.out.println("id not found");
+			    }
+			    
 			} catch (Exception e) {
 				System.err.println(e.getClass().getName() + ": " + e.getMessage());
 				System.exit(0);
@@ -406,6 +504,7 @@ class ServerManager {
 	// Combines the server info with changes than passes it on to push line by
 	// line
 	// Chooses servers by directly entering the server names
+
 	protected void getServs() {
 		final ArrayList<String> servs = new ArrayList<String>();
 		
@@ -693,7 +792,63 @@ System.out.println("adding Serv");
 
 modifyServers.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e){
+		FlowLayout addLayout = new FlowLayout();
+		 final JPanel changePan= new JPanel(addLayout);
+
 		
+	JLabel id = new JLabel ("Enter id here, must be a number");
+	final TextField idInput= new TextField ("");
+	JLabel column = new JLabel ("Enter the column name here, either number, type, department, CIF, IP");
+	final TextField columnInput= new TextField ("");
+	final JLabel change = new JLabel ("Enter what you want to change the value to");
+	final TextField changeInput= new TextField ("");
+	changePan.add(id);
+	changePan.add(idInput);
+	changePan.add(column);
+	changePan.add(columnInput);
+	changePan.add(change);
+	changePan.add(changeInput);
+
+	JButton done=new JButton("Done");
+	changePan.add(done);
+	done.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try{
+			modifyServerSQL(Integer.parseInt(idInput.getText()), columnInput.getText(), changeInput.getText());
+			}
+			catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	});
+	
+	JButton back= new JButton("Back");
+	changePan.add(back);
+	back.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			startManager();
+		}
+	});
+	
+	
+		frameManager.getContentPane().removeAll();
+		
+		System.out.println("change pan");
+		//frameManager.getContentPane().add(list[0]);
+		frameManager.add(changePan);
+		frameManager.revalidate();
+				frameManager.pack();
+				frameManager.setVisible(true);
+		//String [] results=addPan();//autoPanel(introPan, "lid:","tEnter id here, must be a number","lnumber","tEnter the server number here (the e.g for GCDOCS-45393 type 45393)","ltype","tEnter type here 2 characters", "ldep:", "tEnter the department acronym here eg SSC","lcif","tEnter cif here must be a number eg 1","lip:","tEnter ip here 1430-3212-2342");
+		//System.out.println(results[0]+results[1]+results[2]+results[3]+results[4]+results[5]+results[6]+results[7]);	
+System.out.println("changing Serv");
+
+
 	}
 })	;		
 
@@ -715,12 +870,14 @@ deleteServers.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					try{
 					deleteServerSQL(Integer.parseInt(idInput.getText()));
+					//System.out.println("deleting Server"+idInput.getText());
 					}
 					catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
+				
 			});
 			
 			JButton back= new JButton("Back");
