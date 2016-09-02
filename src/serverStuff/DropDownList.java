@@ -13,6 +13,7 @@ import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 public class DropDownList extends JApplet {
@@ -80,15 +81,21 @@ public void init() {
 public static void main(String[] args) {
 
 	DropDownList x=new DropDownList();
- x.run( 200, 125);
+	JFrame frame = new JFrame();
+ x.run( 200, 125,frame);
 }
 
-public  void run( int width, int height) {
- JFrame frame = new JFrame();
+public  void run( int width, int height, JFrame frame) {
+// JFrame frame = new JFrame();
+ JLabel test= new JLabel ("hellooo");
+ frame.add(test);
  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ frame.getContentPane().removeAll();
  frame.getContentPane().add(this);
  frame.setSize(width, height);
+ System.out.println("init");
  init();
+ System.out.println("start");
  start();
  frame.setVisible(true);
 }

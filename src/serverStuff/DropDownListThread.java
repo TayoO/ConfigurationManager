@@ -1,5 +1,7 @@
 package serverStuff;
 
+import javax.swing.JFrame;
+
 public class DropDownListThread extends Thread {
 	 DropDownList d;
 	 String [] dummy={"dummy"};
@@ -14,14 +16,15 @@ public class DropDownListThread extends Thread {
 	 public static void main (String [] args) throws InterruptedException
 	 {
 	 DropDownListThread test=new DropDownListThread();
-	 test.run(300,500);
+	 JFrame frame = new JFrame();
+	 test.run(300,500,frame);
 	 }
-	   public void run(int width, int height) throws InterruptedException{
-	        synchronized(this){
-	        	d.run(width, height);
-	        while (!d.done){
-	        	System.out.println("sleeping half a second");
-	        sleep(500);
+	   public void run(int width, int height, JFrame frame) throws InterruptedException{
+	       synchronized(this){
+	        	d.run(width, height,frame);
+	        for (int i=5; i>0; i--){
+	        	System.out.println(i+"second(s) left");
+	        sleep(1000);
 
 	        }
 	        //System.out.println(d.results.toArray()[0]);

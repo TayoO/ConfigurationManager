@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,7 +18,6 @@ import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
 
 
 
@@ -33,43 +31,32 @@ class ServerManager {
 	//Another possibility would be to use unique constraints for back and done buttons to keep it consistent across screens
 	static GridBagConstraints globalConstraints = new GridBagConstraints();
 
-	
-	
 //Outside of droplist applets all graphics go on this one frame.
 	final BasicFrame frameManager = new BasicFrame();
 
 	// Intro panel is the first panel that appears when 
 	final JPanel introPan = new JPanel(new GridBagLayout());
+
 	//static Scanner in = new Scanner(System.in);
 
 // An array is used because final objects can't be set to new values, but changing values inside objects doesn't count as a change
-
 	
-	 
-
-
-		
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
-		//initiating an new configuration object
-		
+		//initiating an new configuration object	
 		ServerManager main = new ServerManager();
-		//running the configuration object
+		
+	    // Shows the servers in the database
 		SQLShowServs();
+		
+		//running the configuration object
 		main.startManager();
 }
-	/*
-	 * file code: numGroups numServers listOfGroupNames seperated by commas
-	 * ListOfServerNames seperated by commas numGroups lines each with list of
-	 * servers indexes corresponding to respective groups seperated by commas
-	 * Example] 5 6 frontEnd, BackEnd, PWGSC, SSC, RCMP PWFE, PWBE, SSCFE,
-	 * SSCBE, RCMPFE, RCMPBE 1,3,5 2,4,6 1,2h 5,6
-	 */
+	
 	
 	public void serverManager(){
 		//Insets means no matter what else, all buttons will maintain are certain distance from the edges of the panel/frame. The larger the integer values passed, the further from the edges it goes.
-		//globalConstraints.insets = new Insets(40, 40, 40, 40);
+		globalConstraints.insets = new Insets(40, 40, 40, 40);
 	}
-	
 	
 	//startManager runs the introPan. The intro pan is the first panel that the user sees. 
 	//From here the user can choose to manage the list of servers and go to serverManagerList, or try to push configurations, which means they must first go to chooseServers to pick which servers they push too.
@@ -129,7 +116,6 @@ class ServerManager {
 				try {
 					chooseServers();
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -148,18 +134,14 @@ class ServerManager {
 	protected static void SQLShowServs() {
 		Connection c = null;
 		Statement stmt = null;
+		String sql;
+		ResultSet rs;
 		ArrayList<String> names = new ArrayList<String>();
 		int counter=0;
 		try {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			String sql="select * from sqlite_master";
-			stmt = c.createStatement();
-			ResultSet rs =stmt.executeQuery(sql);
-			System.out.print(" Databasename1: "+rs.getString("name"));
-			System.out.print("   "+rs.next()+" Databasename2: "+rs.getString("name"));
-			System.out.print("   "+rs.next()+" Databasename3: "+rs.getString("name"));
-			System.out.print("   "+rs.next());
+
 		stmt = c.createStatement();
 		sql = "Select * from Server;";
 		stmt.executeUpdate(sql);
@@ -177,6 +159,7 @@ class ServerManager {
 			System.out.print(" CIF: " +rs.getString("CIF"));
 			System.out.println(" IP: " +rs.getString("IP"));
 		}
+		System.out.println(" There are "+counter+" servers.");
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			System.exit(0);
@@ -193,7 +176,7 @@ class ServerManager {
 		    catch (Exception ex) {
 		        System.out.println ("Error closing connections");
 		    }
-		String[] exampleArray = new String[counter];
+
 		
 	}
 	
@@ -201,7 +184,7 @@ class ServerManager {
 		// Variables for sql connection
 		Connection c = null;
 		Statement stmt = null;
-		// array list for srry of unknown size, regular arrays slow to append
+		// array list for string of unknown size, regular arrays slow to append
 		ArrayList<String> names = new ArrayList<String>();
 		int counter = 0;
 		try {
@@ -209,10 +192,20 @@ class ServerManager {
 			c = DriverManager.getConnection("jdbc:sqlite:test.db");
 			stmt = c.createStatement();
 			// For each department and type combination there is a unique search
+			String sql;
+			
+			
 			for (int i = 0; i < departs.length; i++) {
+				
+				// Allows for all departments to be chosen
+				if((departs[i].toLowerCase()).equals(("all"))){
+					departs[i]="*";
+				}
 				for (int j = 0; j < type.length; j++) {
-
-					String sql = "Select * from Server where Department =\'" + departs[i] + "\'and Type=\'" + type[j]
+					//Allows for all types to be chosen
+					if((type[i].toLowerCase()).equals(("all")));
+type[i]="*";
+					 sql = "Select * from Server where Department =\'" + departs[i] + "\'and Type=\'" + type[j]
 							+ "\';";
 					// sql="Select * from Server ;";
 					stmt.executeUpdate(sql);
@@ -345,45 +338,74 @@ class ServerManager {
 	
 }
 	//This method, when working properly, gets the list of departments and the list of types that are to be pushed to from dropDownListThread objects. 
-	public void getGroups() throws InterruptedException{
+	public void getGroups(JPanel choosePan) throws InterruptedException{
+		FlowLayout addLayout = new FlowLayout();
+		JPanel depTypePan= new JPanel(addLayout);
+		//String [] departList={"SSC","RCMP","VAC","PWGSC", "GCDOCS"};
+		final ArrayList<String> departs = new ArrayList<String>();
+		final ArrayList<String> types = new ArrayList<String>();
+	
+		System.out.println("Waiting for types to be choosen...");
+	
+		JLabel dep = new JLabel ("Enter deparment here, SSC, RCMP, VAC, PWGSC, GCDOCS  ");
+		final TextField depInput= new TextField ("");
+		//String [] typeList={"AD","AG","FE","ID"};
+		
+		JButton depButton= new JButton("push department");
 
-		String [] departs={"SSC","RCMP"};
+		
+		final TextField typeInput= new TextField ("");
+		JLabel type = new JLabel ("Enter the type here");
+		JButton typeButton= new JButton("push type");
+
+		typeButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String str = typeInput.getText();
+				typeInput.setText(" ");
+				types.add(str);
+			}
+		});
+		JButton done=new JButton("Done");
+		depTypePan.add(done);
+		done.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String [] test= {"used to specify String array"};
+				configurations(SQLGroups(departs.toArray(test),types.toArray(test)));
+			
+			}
+		});
+		depButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				departs.add(typeInput.getText());
+				depInput.setText(" ");
+				
+			}
+		});
+		depTypePan.add(dep);
+		depTypePan.add(depInput);
+		depTypePan.add(depButton);
+		depTypePan.add(type);
+		depTypePan.add(typeInput);
+		depTypePan.add(typeButton);
+		depTypePan.add(done);
+		
 		
 	
+		
+		
 	
-       
-		String [] types={"AC","FE"};
-		String [] typeList={"AD","AG","FE","ID"};
-		/*
 	System.out.println("get groups");
 	
 
 		
 		
-		synchronized(chooseDep){
-            try{
-            	
-                
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
-            departs=chooseDep.results;
- if (departs.length==0){
-	 System.out.println("no departments chosen");
- }
- else if (departs.length==1){
-	 System.out.println("The department is "+departs[0]);
- }
- else{
-	 System.out.println("The departments are:");
-	 for (int i=0;i<departs.length; i++)
-	 {
-		 System.out.println(departs[i]);
-	 }
- }
-           
-        }
-        */
+
 		// Copy pasted code from previous lines.
 		/*
 		
@@ -398,26 +420,9 @@ class ServerManager {
                 e.printStackTrace();
             }
             
-		DropDownListThread chooseType=new DropDownListThread(typeList);
-		chooseType.run( 200, 125);
-		System.out.println("Waiting for types to be choosen...");
-            types=chooseType.results;
+	
             */
 		
-            
- if (types.length==0){
-	 System.out.println("no types chosen");
- }
- else if (types.length==1){
-	 System.out.println("The type is "+types[0]);
- }
- else{
-	 System.out.println("The types are:");
-	 for (int i=0;i<types.length; i++)
-	 {
-		 System.out.println(types[i]);
-	 }
- }
 		
 		// main.loadDefault();
 
@@ -426,8 +431,11 @@ class ServerManager {
 		//main.ServerManagerFrame();
 		//main.configFrame();
 		System.out.println("powerscript path listed as" + this.powershell);
-
-		configurations(SQLGroups(departs, types));
+		frameManager.getContentPane().removeAll();
+frameManager.add(depTypePan);
+System.out.println("depTypePan");
+frameManager.revalidate();
+frameManager.setVisible(true);
 		
 		
 	}
@@ -448,9 +456,9 @@ class ServerManager {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					getGroups();
+					getGroups(choosePan);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
+
 					e1.printStackTrace();
 				}
 			}
@@ -541,7 +549,7 @@ frameManager.setVisible(true);
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				(servs).add( editTextArea.getText());
-				editTextArea.setText(" ");
+				editTextArea.setText("Enter servername here");
 				
 			}
 		});
@@ -584,84 +592,8 @@ public void pushConfiguration(String[] servers, String[] change) throws IOExcept
 	
 	
 	//Autopanel is the only panel that is softcoded. In this context what that means is that the contents of the panel can vary based of what values are passed to the method. For this reason, flowlayouts are used instead of hardcoded gridConstraints.
- public String []  autoPanel(final JPanel nextPan, String ... sects){
-		//FlowLayout automatically formats components inside  in a horizzontal layout based on the order they are added. This removes the need for gridConstraints. It is used when the formatting need to be done automatically and scale for various numbers of buttons instead of hard coded
-		
-		FlowLayout autoLayout = new FlowLayout();
 
-		
-		 final JPanel autoPan= new JPanel(autoLayout);
-		 
-	 final boolean [] finished= new boolean [1];
-	 finished[0]=false;
-		JButton back= new JButton("Back");
-		autoPan.add(back);
-	 back.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				startManager();
-			}
-		});
-		
-		String [] output=new String [sects.length];
-		
-		final JComponent [] comp= new JComponent[sects.length];
-		for (int i=0; i<sects.length; i++){
-	
-			if (i%2==1){
-				// Only used since final variables must be used for action performed.
-				
-				// only final objects can be referenced in the actionListener
-				final int unchangeableInt=i;
-				
-				comp[i] = new JTextField(sects[i]);
-			( (JTextField) comp[i]).addActionListener(new ActionListener(){
-					public void actionPerformed(ActionEvent e){
-                            ((JTextComponent) comp[unchangeableInt]).getText();
-					}
-				});
-			}
-			else{
-				comp[i] = new JLabel(sects[i].substring(1,sects[i].length()));
-			}
-			autoPan.add(comp[i]);
-			
-		}
-	 JButton done = new JButton("Done");
-	 
-
-	done.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				
-				frameManager.getContentPane().removeAll();
-				frameManager.add(nextPan);
-				finished[1]=true;
-				System.out.println("next pan");
-				frameManager.getContentPane().add(nextPan, BorderLayout.WEST);
-				frameManager.revalidate();
-						frameManager.pack();
-						frameManager.setVisible(true);
-			 }
-		});
-	
-	 autoPan.add(done);
-	 System.out.println("removeAll");
-	 frameManager.getContentPane().removeAll();
-		frameManager.add(autoPan);
-		System.out.println("auto pan");
-		frameManager.getContentPane().add(autoPan, BorderLayout.WEST);
-		frameManager.revalidate();
-				frameManager.pack();
-				frameManager.setVisible(true);
-				while(!finished[0])
-				{
-					
-				}
-	return output;	
- }
- 
- // This frame gives options on how to modify the server list. Currently only addServer works, deleteServer has also been attempted but buggy
+ // This frame gives options on how to modify the server list. The options are add, modify, and delete both servers and groups Currently only addServer works, deleteServer has also been attempted but buggy
 	public void serverListManagement(){
 		FlowLayout serverLayout = new FlowLayout();
 		 JPanel listPan = new JPanel(serverLayout);
@@ -755,7 +687,6 @@ addingServers.addActionListener(new ActionListener(){
 			addServerSQL(idInput.getText(), numberInput.getText(), typeInput.getText(), depInput.getText(), cifInput.getText(), ipInput.getText());
 			}
 			catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -819,7 +750,6 @@ modifyServers.addActionListener(new ActionListener(){
 			modifyServerSQL(Integer.parseInt(idInput.getText()), columnInput.getText(), changeInput.getText());
 			}
 			catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -853,7 +783,7 @@ System.out.println("changing Serv");
 })	;		
 
 
-
+// Delete ser
 deleteServers.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e){
 		FlowLayout delLayout = new FlowLayout();
@@ -873,7 +803,6 @@ deleteServers.addActionListener(new ActionListener(){
 					//System.out.println("deleting Server"+idInput.getText());
 					}
 					catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -903,7 +832,7 @@ deleteServers.addActionListener(new ActionListener(){
 
 	}
 	// This method gets the changes that are going to be pushed and calls the method to push them passing the servers that they are being pushed to
-    public void configurations(final String [] serversToPushTo) {
+    public JPanel configurations(final String [] serversToPushTo) {
 		final ArrayList<String> changes = new ArrayList<String>();
 		
 		// final int counter=0;
@@ -974,8 +903,8 @@ deleteServers.addActionListener(new ActionListener(){
 				try {
 					System.out.println("pushing changes"+changes.toArray(test)[0]);
 					pushConfiguration(serversToPushTo, changes.toArray(test));
+					startManager();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -1012,6 +941,7 @@ deleteServers.addActionListener(new ActionListener(){
 		frameManager.revalidate();
 		frameManager.pack();
 		frameManager.setVisible(true);
+		return configPan;
 	}
 
 }
