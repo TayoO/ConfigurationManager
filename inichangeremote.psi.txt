@@ -1,0 +1,171 @@
+﻿#FAILED test a cdoq
+#open ports at cdoq
+#OK toujours le meme path? ou le rentre en parametre
+#OK filename new and old
+#OK list of servers
+#OK backup file
+#enable winrm at cdoq?
+#add log file to know what was done
+#error handling
+clear
+$cred = Get-Credential
+$serverList = "C:\temp\changes.csv"
+
+Import-Csv $serverList |
+foreach{
+	$server = $_.server  
+	$section = $_.section
+    $name = $_.name
+    $value = $_.value
+    $pathandfilename = $_.pathandfilename
+  
+invoke-command -computer $server -credential $cred -scriptblock {
+
+Function Get-IniContent {  
+      
+    [CmdletBinding()]  
+    Param(  
+        [ValidateNotNullOrEmpty()]  
+        [ValidateScript({(Test-Path $_)})]  
+        [Parameter(ValueFromPipeline=$True,Mandatory=$True)]  
+        [string]$FilePath  
+    )  
+      
+    Begin  
+        {Write-Verbose "$($MyInvocation.MyCommand.Name):: Function started"}  
+          
+    Process  
+    {  
+        Write-Verbose "$($MyInvocation.MyCommand.Name):: Processing file: $Filepath"  
+              
+        $ini = [ordered]@{}  
+        switch -regex -file $FilePath  
+        {  
+            "^\[(.+)\]$" # Section  
+            {  
+                $section = $matches[1]  
+                $ini[$section] =[ordered] @{}  
+                $CommentCount = 0  
+            }  
+            "^(;.*)$" # Comment  
+            {  
+                if (!($section))  
+                {  
+                    $section = "No-Section"  
+                    $ini[$section] = [ordered]@{}  
+                }  
+                $value = $matches[1]  
+                $CommentCount = $CommentCount + 1  
+                $name = "Comment" + $CommentCount  
+                $ini[$section][$name] = $value  
+            }   
+            "(.+?)\s*=\s*(.*)" # Key  
+            {  
+                if (!($section))  
+                {  
+                    $section = "No-Section"  
+                    $ini[$section] = [ordered]@{}  
+                }  
+                $name,$value = $matches[1..2]  
+                $ini[$section][$name] = $value  
+            }  
+        }  
+        Write-Verbose "$($MyInvocation.MyCommand.Name):: Finished Processing file: $FilePath"  
+        Return $ini  
+    }  
+          
+    End  
+        {Write-Verbose "$($MyInvocation.MyCommand.Name):: Function ended"}  
+}
+
+
+Function Out-IniFile {  
+    
+      
+    [CmdletBinding()]  
+    Param(  
+        [switch]$Append,  
+          
+        [ValidateSet("Unicode","UTF7","UTF8","UTF32","ASCII","BigEndianUnicode","Default","OEM")]  
+        [Parameter()]  
+        [string]$Encoding = "Unicode",  
+ 
+          
+        [ValidateNotNullOrEmpty()]  
+        [Parameter(Mandatory=$True)]  
+        [string]$FilePath,  
+          
+        [switch]$Force,  
+          
+        [ValidateNotNullOrEmpty()]  
+        [Parameter(ValueFromPipeline=$True,Mandatory=$True)]  
+        [System.Collections.Specialized.OrderedDictionary]$InputObject,  
+          
+        [switch]$Passthru  
+    )  
+      
+    Begin  
+        {Write-Verbose "$($MyInvocation.MyCommand.Name):: Function started"}  
+          
+    Process  
+    {  
+        Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing to file: $Filepath"  
+          
+        if ($append) {$outfile = Get-Item $FilePath}  
+        else {$outFile = New-Item -ItemType file -Path $Filepath -Force:$Force}  
+        if (!($outFile)) {Throw "Could not create File"}  
+       
+        foreach ($i in $InputObject.keys)  
+        {               
+            if (!($($InputObject[$i].GetType().Name) -eq "OrderedDictionary"))  
+            {  
+                #No Sections  
+                Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing key: $i"  
+                Add-Content -Path $outFile -Value "$i=$($InputObject[$i])" -Encoding $Encoding  
+            } else {  
+                #Sections  
+                Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing Section: [$i]"  
+                Add-Content -Path $outFile -Value "[$i]" -Encoding $Encoding  
+                Foreach ($j in $($InputObject[$i].keys))  
+                {  
+                    if ($j -match "^Comment[\d]+") {  
+                        Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing comment: $j"  
+                        Add-Content -Path $outFile -Value "$($InputObject[$i][$j])" -Encoding $Encoding  
+                    } else {  
+                        Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing key: $j"  
+                        Add-Content -Path $outFile -Value "$j=$($InputObject[$i][$j])" -Encoding $Encoding  
+                    }  
+                      
+                }  
+                Add-Content -Path $outFile -Value "" -Encoding $Encoding  
+            }  
+        }  
+        Write-Verbose "$($MyInvocation.MyCommand.Name):: Finished Writing to file: $path"  
+        if ($PassThru) {Return $outFile}  
+    }  
+          
+    End  
+        {Write-Verbose "$($MyInvocation.MyCommand.Name):: Function ended"}  
+} 
+
+
+######MAIN#######
+
+  
+ $timestamp = get-date -format o     
+ $timestamp = $timestamp -replace ":" , "-"
+ $timestamp = $timestamp -replace "\." , "-"
+ $otiniFile = "C:\temp\opentext.ini"
+ $newotiniFile = "c:\temp\opentextsource" + $timestamp
+ $otiniFile2 = "C:\temp\opentext2.ini"
+  $ini = Get-IniContent $Using:pathandfilename
+    $ini["$Using:section"]["$Using:name"]=$Using:value
+   #   cat c:\temp\atipsql.ini
+  #    $ini["general"]["HaveSeenLicenseSetupPage"]="FALSE"
+      Out-IniFile -Encoding UTF8 -InputObject $ini -FilePath $otiniFile2 -Force
+      move $otiniFile  $newotiniFile
+      move $otiniFile2 $otiniFile
+      Write-Host("Wrote Value:$Using:value in Section:[$Using:section][$Using:name] on Server:$Using:server in File:$Using:pathandfilename") -foreground "green"
+  
+} #invoke command
+}
